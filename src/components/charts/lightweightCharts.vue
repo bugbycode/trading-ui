@@ -10,7 +10,7 @@
         defineExpose,
         defineProps,
     } from 'vue';
-    import { createChart } from 'lightweight-charts';
+    import { createChart, } from 'lightweight-charts';
     //以下是k线图表逻辑代码
     const chart_props = defineProps({
         type: {
@@ -37,6 +37,9 @@
         priceScaleOptions: {
             type: Object,
         },
+        priceFormatOptions: {
+            type: Object,
+        },
     });
 
     // Function to get the correct series constructor name for current series type.
@@ -60,7 +63,6 @@
         return chart;
     };
 
-    defineExpose({ fitContent, getChart });
 
     // Auto resizes the chart when the browser window is resized.
     const resizeHandler = () => {
@@ -76,6 +78,11 @@
         series.setData(chart_props.data);
     };
 
+    const updateData = (d) => {
+        //console.log(d);
+        series.update(d);
+    }
+
     // select code end=============================================
 
     onMounted(() => {
@@ -85,11 +92,15 @@
         addSeriesAndData(chart_props);
 
         if (chart_props.priceScaleOptions) {
-            chart.priceScale().applyOptions(chart_props.priceScaleOptions);
+            chart.priceScale('right').applyOptions(chart_props.priceScaleOptions);
         }
 
         if (chart_props.timeScaleOptions) {
             chart.timeScale().applyOptions(chart_props.timeScaleOptions);
+        }
+
+        if(chart_props.priceFormatOptions){
+            chart.applyOptions(chart_props.priceFormatOptions)
         }
 
         chart.timeScale().fitContent();
@@ -182,4 +193,5 @@
         }
     );
 
+    defineExpose({ fitContent, getChart,updateData });
 </script>
