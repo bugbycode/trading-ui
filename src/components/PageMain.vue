@@ -1,4 +1,5 @@
 <template>
+    <!--
     <el-row>
         <el-col :span="2">
             <el-select
@@ -29,16 +30,23 @@
                 <el-radio-button label="1d" />
             </el-radio-group>
         </el-col>
-    </el-row>
+    </el-row>-->
     <el-row class="chart-row">
         <el-col :span="24" class="chart-col">
+            <!--
             <ChartsPage ref="chartsPageRef" 
                 :data="data" 
+                :crosshair="crosshair"
                 :priceFormatOptions="priceFormatOptions"
-                ></ChartsPage>
+                ></ChartsPage>-->
+            <tradingViewPage></tradingViewPage>
         </el-col>
     </el-row>
 </template>
+<script lang="ts" setup>
+    import tradingViewPage from './charts/tradingView.vue';
+</script>
+<!--
 <script lang="ts" setup>
     //import WebSocket from 'ws';
     import ChartsPage from './charts/lightweightCharts.vue'
@@ -50,7 +58,11 @@
 
     //klines data
     var data = ref([{ time: new Date().getTime() / 1000, open: 75.16, high: 82.84, low: 36.16, close: 45.72 }]);
-
+    var crosshair = {
+        crosshair:{
+            mode: 0
+        }
+    };
     //binance klines http url https://fapi.binance.com
     const baseHttpUrl = 'https://fapi.binance.com';
     const baseWebSocketUrl = 'wss://fstream.binance.com';
@@ -210,7 +222,7 @@
         clientArr.push(socketClient);
     }
 </script>
-
+-->
 <style scoped>
     /* 使el-row和el-col使用flex布局，并且高度为100% */
     .chart-row {

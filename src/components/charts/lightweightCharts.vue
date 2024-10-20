@@ -21,6 +21,9 @@
             type: Array,
             required: true,
         },
+        crosshair: {
+            type: Object,
+        },
         autosize: {
             default: true,
             type: Boolean,
@@ -103,11 +106,29 @@
             chart.applyOptions(chart_props.priceFormatOptions)
         }
 
+        if(chart_props.crosshair){
+            chart.applyOptions(chart_props.crosshair)
+        }
+
         chart.timeScale().fitContent();
 
         if (chart_props.autosize) {
             window.addEventListener('resize', resizeHandler);
         }
+
+        chart.subscribeCrosshairMove(function(param){
+            if (!param.point) {
+                return;
+            }
+
+            // 获取当前鼠标悬停的数据点
+            const candlestickData = param.seriesData.get(series);
+            if (candlestickData) {
+                const { open, high, low, close } = candlestickData;
+                console.log(`开盘价: ${open}, 最高价: ${high}, 最低价: ${low}, 收盘价: ${close}`);
+                chart.setCrosshairPosition({price:high,time:param.time})
+            }
+        });
     })
 
     onUnmounted(() => {
