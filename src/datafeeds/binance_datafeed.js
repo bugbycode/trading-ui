@@ -106,7 +106,8 @@ export default {
                     open:Number(d[1]),
                     high:Number(d[2]),
                     low:Number(d[3]),
-                    close:Number(d[4])
+                    close:Number(d[4]),
+                    volume: Number(d[5]),
                 });
             })
         }
@@ -130,7 +131,8 @@ export default {
                 open: Number(k.o),
                 close: Number(k.c),
                 high: Number(k.h),
-                low: Number(k.l)
+                low: Number(k.l),
+                volume: Number(k.v),
             });
             document.title = k.c + ' | ' + symbolInfo.name + ' U本位永续合约';
         };
