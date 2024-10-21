@@ -8,9 +8,22 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
-  resolve: {
+  resolve: { 
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  },server: {
+    proxy: {
+      '/user': {
+        target: 'http://localhost:8788',
+        changeOrigin: true,
+      },'/login': {
+        target: 'http://localhost:8788',
+        changeOrigin: true,
+      },'/logout': {
+        target: 'http://localhost:8788',
+        changeOrigin: true,
+      }
     }
   }
 })

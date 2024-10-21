@@ -9,31 +9,8 @@
         margin: 0;
       }
     </style>
-<!--
-	<script type="text/javascript" src="./public/charting_library/charting_library.standalone.js"></script>
-	<script type="text/javascript" src="./public/datafeeds/udf/dist/bundle.js"></script>
-	
-    <script type="text/javascript">
-		function initOnReady() {
-			var widget = window.tvWidget = new TradingView.widget({
-				library_path: "/public/charting_library/",
-				debug: true, // uncomment this line to see Library errors and warnings in the console
-				fullscreen: true,
-				symbol: 'AAPL',
-				interval: '1D',
-				container: "tv_chart_container",
-				datafeed: new Datafeeds.UDFCompatibleDatafeed("https://demo-feed-data.tradingview.com"),
-				locale: "zh_cn",
-				disabled_features: [],
-				enabled_features: [],
-			});
-		};
-
-		window.addEventListener('DOMContentLoaded', initOnReady, false);
-	</script>-->
   </head>
   <body>
-    <!--<div id="tv_chart_container"></div>-->
 	
     <div id="app"></div>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>

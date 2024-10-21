@@ -17,7 +17,7 @@ const props = defineProps({
 		type: String,
 	},
 	interval: {
-		default: '',
+		default: '1D',
 		type: String,
 	},
 	datafeedUrl: {
@@ -110,7 +110,44 @@ onMounted(() => {
 
 			button.innerHTML = 'Check API';
 		});
+		
+		chartWidget.activeChart().createMultipointShape(
+			[{"price":72144,"time":1717718400},{"price":53329.5,"time":1720137600},{"price":70081,"time":1722211200},{"price":48888,"time":1722816000},{"price":68749,"time":1729382400}],
+			{ 
+				shape:'xabcd_pattern',
+				overrides: {"color":"#2962FF","textcolor":"#ffffff","fillBackground":true,"backgroundColor":"#2962FF","fontsize":12,"bold":false,"italic":false,"transparency":85,"linewidth":1,"visible":true,"frozen":false,"intervalsVisibilities":{"ticks":true,"seconds":true,"secondsFrom":1,"secondsTo":59,"minutes":true,"minutesFrom":1,"minutesTo":59,"hours":true,"hoursFrom":1,"hoursTo":24,"days":true,"daysFrom":1,"daysTo":366,"weeks":true,"weeksFrom":1,"weeksTo":52,"months":true,"monthsFrom":1,"monthsTo":12,"ranges":true},"title":""}
+			}
+		);
+		chartWidget.activeChart().createMultipointShape(
+			[{"price":73881.4,"time":1710374400}],
+			{
+				shape:'horizontal_ray',
+			}
+		)
 	});
+
+	chartWidget.subscribe('drawing', (event) => {
+		console.log(event.value);
+		/*var allShapes = chartWidget.activeChart().getAllShapes();
+		for(var index = 0;index < allShapes.length;index++){
+			var shape = chartWidget.activeChart().getShapeById(allShapes[index].id);
+			console.log(shape.id);
+			console.log(JSON.stringify(shape.getProperties()));
+			console.log(JSON.stringify(shape.getPoints()))
+		}*/
+	});
+
+	chartWidget.subscribe('drawing_event', (id, type) => {
+		if(type == 'create'){
+			console.log(chartWidget.activeChart().symbol())
+			var shape = chartWidget.activeChart().getShapeById(id);
+			console.log(shape._source.toolname);
+			console.log(JSON.stringify(shape.getProperties()));
+			console.log(JSON.stringify(shape.getPoints()))
+			console.log(shape)
+		}
+	});
+	
 });
 
 onUnmounted(() => {
@@ -127,6 +164,6 @@ onUnmounted(() => {
 
 <style scoped>
 .TVChartContainer {
-	height: calc(100vh - 80px);
+	height: calc(100vh - 63px);
 }
 </style>

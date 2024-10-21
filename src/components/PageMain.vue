@@ -238,7 +238,7 @@
     .lw-chart {
         flex-grow: 1; /* 使图表容器占满剩余的空间 */
         width: 100%;
-        height: calc(100vh - 93px);
+        height: calc(100vh - 60px);
         background-color: #222;
     }
 </style>
