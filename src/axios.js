@@ -23,9 +23,13 @@ instance.interceptors.response.use(
     return response.data;
   },
   error => {
-    console.log(error);
+    //console.log(error);
     // 处理错误响应
-    return Promise.reject(error);
+    if(error.status){
+      return {status: 500,message:'server error.'}
+    } else {
+      return Promise.reject(error);
+    }
   }
 );
 
