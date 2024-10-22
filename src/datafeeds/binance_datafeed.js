@@ -45,7 +45,8 @@ const coinInfo = [
 
 const shapeType = new Map();
 shapeType.set('LineToolTrendLine','trend_line');
-shapeType.set('LineToolRay','ray')
+shapeType.set('LineToolRay','ray');
+shapeType.set('LineToolParallelChannel','parallel_channel')
 
 var widget = null;
 var shapeMap = new Map();
@@ -126,7 +127,7 @@ export default {
                 draw_status: 1,
             }
             var result = await axios.post('/shape/saveShapeInfo',jsonData);
-            jsonData.id = result.id;
+            jsonData._id = result.id;
             //console.log(result);
             var shapeArray = shapeMap.get(jsonData.symbol);
             if(shapeArray==undefined){
@@ -163,7 +164,7 @@ export default {
         if(shapeArray){
             for(var index = 0;index < shapeArray.length;index++){
                 var shapeInfo = shapeArray[index];
-                if(shapeInfo.draw_id == id){
+                if(shapeInfo.draw_id == id && shapeInfo._id != ''){
                     shapeInfo.id = shapeInfo._id;
                     shapeInfo.properties = JSON.stringify(properties);
                     shapeInfo.points = JSON.stringify(points);
@@ -247,7 +248,9 @@ export default {
     subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) => {
         console.log('[subscribeBars]: Method call with subscriberUID:', subscriberUID);
         
-        drowBySymbol(symbolInfo.name)
+        setTimeout(() => {
+            drowBySymbol(symbolInfo.name);
+        }, 500);
 
         var socketClient = new WebSocket(baseWebSocketUrl + "/ws/" + symbolInfo.name.toLowerCase() + '_perpetual@continuousKline_' + inervalData[resolution].toLowerCase());
         socketClient.onopen = () => {

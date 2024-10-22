@@ -91,9 +91,10 @@ onMounted(() => {
 	};
 	chartWidget = new widget(widgetOptions);
 	
+	Datafeed.initDbShapeInfo(chartWidget);
+
 	chartWidget.onChartReady(() => {
 		console.log('on chart ready.')
-
 		//在图表添加绘图时触发的事件
 		chartWidget.subscribe('drawing', (event) => {
 			console.log(`drawing type as :${event.value}`);
@@ -101,7 +102,6 @@ onMounted(() => {
 		//创建、修改、删除绘图时触发的事件
 		chartWidget.subscribe('drawing_event', (id, type) => {
 			console.log(`id:${id}, type:${type}`);
-			
 			if(type == 'create'){
 				Datafeed.saveShapeInfo(id);
 			} else if(type == 'remove'){
@@ -112,7 +112,6 @@ onMounted(() => {
 		});
 	});
 
-	Datafeed.initDbShapeInfo(chartWidget);
 });
 
 onUnmounted(() => {
