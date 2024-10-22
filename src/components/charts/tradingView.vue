@@ -1,10 +1,7 @@
 <script setup>
 import { onMounted, ref, onUnmounted } from 'vue';
 import { widget } from './../../../public/charting_library';
-//import { UDFCompatibleDatafeed } from './../../../public/datafeeds/udf/src/udf-compatible-datafeed';
 import Datafeed from './../../datafeeds/binance_datafeed.js';
-
-import axios from './../../axios';
 
 function getLanguageFromURL() {
 	const regex = new RegExp('[\\?&]lang=([^&#]*)');
@@ -109,6 +106,8 @@ onMounted(() => {
 				Datafeed.saveShapeInfo(id);
 			} else if(type == 'remove'){
 				Datafeed.removeShapeInfo(id);
+			} else if(type == 'properties_changed' || type == 'points_changed'){
+				Datafeed.changeShapeInfo(id);
 			}
 		});
 	});

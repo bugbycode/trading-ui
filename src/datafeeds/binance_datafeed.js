@@ -52,8 +52,8 @@ var shapeMap = new Map();
 //画图
 const drowBySymbol = (symbol) => {
     var shapeArr = shapeMap.get(symbol);
-	console.log(`drow : ${symbol}`)
-    console.log(shapeArr)
+	//console.log(`drow : ${symbol}`)
+    //console.log(shapeArr)
 	if(shapeArr){
 		for(var index = 0;index < shapeArr.length;index++){
 			var shapeInfo = shapeArr[index];
@@ -145,6 +145,29 @@ export default {
                 var shapeInfo = shapeArray[index];
                 if(shapeInfo.draw_id == id){
                     axios.post('/shape/deleteShapeInfo/'+ shapeInfo._id);
+                }
+            }
+        }
+    },
+    //修改图纸
+    changeShapeInfo: (id) => {
+        var symbol = widget.activeChart().symbol();
+        //图纸实例
+        var iLineDataSourceApi = widget.activeChart().getShapeById(id);
+        //绘图属性
+        var properties = iLineDataSourceApi.getProperties();
+        //绘图坐标 [{price:double,time:Long}]
+        var points = iLineDataSourceApi.getPoints();
+        //已存储的
+        var shapeArray = shapeMap.get(symbol);
+        if(shapeArray){
+            for(var index = 0;index < shapeArray.length;index++){
+                var shapeInfo = shapeArray[index];
+                if(shapeInfo.draw_id == id){
+                    shapeInfo.id = shapeInfo._id;
+                    shapeInfo.properties = JSON.stringify(properties);
+                    shapeInfo.points = JSON.stringify(points);
+                    axios.post('/shape/updateShapeInfo',shapeInfo);
                 }
             }
         }
