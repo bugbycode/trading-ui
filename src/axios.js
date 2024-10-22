@@ -10,6 +10,14 @@ const instance = axios.create({
 // 配置请求拦截器（可选）
 instance.interceptors.request.use(
   config => {
+    const timestamp = new Date().getTime();
+  
+    // 如果请求已经带有params，直接追加时间戳
+    if (config.params) {
+      config.params.t = timestamp;
+    } else {
+      config.params = { t: timestamp };
+    }
     // 可以在这里处理，比如添加 token 到请求头
     return config;
   },

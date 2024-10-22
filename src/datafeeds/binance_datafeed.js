@@ -44,9 +44,17 @@ const coinInfo = [
 ]
 
 const shapeType = new Map();
-shapeType.set('LineToolTrendLine','trend_line');
-shapeType.set('LineToolRay','ray');
-shapeType.set('LineToolParallelChannel','parallel_channel')
+shapeType.set('LineToolTrendLine','trend_line');//趋势线
+shapeType.set('LineToolRay','ray');//射线
+shapeType.set('LineToolParallelChannel','parallel_channel')//平行通道
+shapeType.set('LineToolHorzRay','horizontal_ray')//水平射线
+shapeType.set('LineToolTrianglePattern','triangle_pattern')//三角形
+shapeType.set('LineToolRectangle','rectangle');//矩形
+shapeType.set('LineToolFibRetracement','fib_retracement')//斐波那契回撤
+shapeType.set('LineTool5PointsPattern','xabcd_pattern')//XABCD
+shapeType.set('LineToolRiskRewardLong','long_position')//做多交易计划
+shapeType.set('LineToolRiskRewardShort','short_position')//做空交易计划
+shapeType.set('LineToolFixedRangeVolumeProfile','fixed_range_volume_profile')//成交量密集分布
 
 var widget = null;
 var shapeMap = new Map();
@@ -115,7 +123,7 @@ export default {
         var properties = iLineDataSourceApi.getProperties();
         //绘图坐标 [{price:double,time:Long}]
         var points = iLineDataSourceApi.getPoints();
-        
+        console.log(iLineDataSourceApi)
         var shape_type = shapeType.get(iLineDataSourceApi._source.toolname);
         if(shape_type){
             var jsonData = {
