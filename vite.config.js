@@ -26,6 +26,9 @@ export default defineConfig({
       },'/logout': {
         target: 'http://localhost:8788',
         changeOrigin: true,
+      },'/pairs': {
+        target: 'http://localhost:8788',
+        changeOrigin: true,
       }
     }
   }

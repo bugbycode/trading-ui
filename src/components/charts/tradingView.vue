@@ -3,6 +3,8 @@ import { onMounted, ref, onUnmounted } from 'vue';
 import { widget } from './../../../public/charting_library';
 import Datafeed from './../../datafeeds/binance_datafeed.js';
 
+Datafeed.initPairsInfo();
+
 function getLanguageFromURL() {
 	const regex = new RegExp('[\\?&]lang=([^&#]*)');
 	const results = regex.exec(window.location.search);
@@ -17,7 +19,7 @@ const props = defineProps({
 		type: String,
 	},
 	interval: {
-		default: '1D',
+		default: '60',
 		type: String,
 	},
 	datafeedUrl: {

@@ -33,7 +33,7 @@ const inervalData = {
     "1M":"1M",
 };
 
-const coinInfo = [
+var coinInfo = [
     'BTCUSDT',
     'ETHUSDT',
     'BNBUSDT',
@@ -89,7 +89,21 @@ const drowBySymbol = (symbol) => {
 export default {
 
     drowBySymbol: drowBySymbol,
-    
+    //获取服务端配置的交易对
+    initPairsInfo: async() => {
+        var result = await axios.get('/pairs/getPairs');
+        var pairs_arr = result;
+        if(pairs_arr && pairs_arr.length > 0){
+            coinInfo = [];
+            for(var index = 0;index < pairs_arr.length;index++){
+                var pair = pairs_arr[index];
+                if(pair.trim() == ''){
+                    continue;
+                }
+                coinInfo.push(pair.trim());
+            }
+        }
+    },
     //初始化已存储的图纸
     initDbShapeInfo: async(chartWidget) => {
         widget = chartWidget;
@@ -159,7 +173,7 @@ export default {
         }
     },
     //修改图纸
-    changeShapeInfo: (id) => {
+    changeShapeInfo: async(id) => {
         var symbol = widget.activeChart().symbol();
         //图纸实例
         var iLineDataSourceApi = widget.activeChart().getShapeById(id);
@@ -176,7 +190,7 @@ export default {
                     shapeInfo.id = shapeInfo._id;
                     shapeInfo.properties = JSON.stringify(properties);
                     shapeInfo.points = JSON.stringify(points);
-                    axios.post('/shape/updateShapeInfo',shapeInfo);
+                    await axios.post('/shape/updateShapeInfo',shapeInfo);
                 }
             }
         }
