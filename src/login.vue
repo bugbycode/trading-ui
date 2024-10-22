@@ -61,8 +61,8 @@
     }
 
     //登录表单信息
-    var userInput = ref('bugbycode@gmail.com');
-    var passInput = ref('yc007');
+    var userInput = ref('');
+    var passInput = ref('');
 
     const login = async () => {
       var username = userInput.value;
