@@ -17,6 +17,9 @@ export default defineConfig({
       '/user': {
         target: 'http://localhost:8788',
         changeOrigin: true,
+      },'/shape': {
+        target: 'http://localhost:8788',
+        changeOrigin: true,
       },'/login': {
         target: 'http://localhost:8788',
         changeOrigin: true,

@@ -1,4 +1,5 @@
-import axios from 'axios';
+import axios_ from 'axios';
+import axios from './../axios'
 import { generateSymbol, parseFullSymbol } from './helpers.js';
 //binance klines http url https://fapi.binance.com
 const baseHttpUrl = 'https://fapi.binance.com';
@@ -42,7 +43,112 @@ const coinInfo = [
     '1000PEPEUSDT'
 ]
 
+const shapeType = new Map();
+shapeType.set('LineToolTrendLine','trend_line');
+shapeType.set('LineToolRay','ray')
+
+var widget = null;
+var shapeMap = new Map();
+//画图
+const drowBySymbol = (symbol) => {
+    var shapeArr = shapeMap.get(symbol);
+	console.log(`drow : ${symbol}`)
+    console.log(shapeArr)
+	if(shapeArr){
+		for(var index = 0;index < shapeArr.length;index++){
+			var shapeInfo = shapeArr[index];
+			var shape_type = shapeType.get(shapeInfo.shape);
+			if(shape_type){
+				if(shapeInfo.draw_status == 0){
+					var entityId = widget.activeChart().createMultipointShape(
+						shapeInfo.points,
+						{
+							shape: shapeType.get(shapeInfo.shape),
+							overrides: shapeInfo.properties,
+						}
+					);
+					if(entityId){
+						shapeInfo.draw_status = 1;
+						shapeInfo.draw_id = entityId
+					}
+				}
+			}
+		}
+	}
+}
+
 export default {
+
+    drowBySymbol: drowBySymbol,
+    
+    //初始化已存储的图纸
+    initDbShapeInfo: async(chartWidget) => {
+        widget = chartWidget;
+        var all_shape = await axios.get('/shape/getAllShapeInfo');
+        if(all_shape && all_shape.length > 0 && all_shape[0].symbol){
+            for(var index = 0;index < all_shape.length;index++){
+                var shapeInfo = all_shape[index];
+                var shapeArr = shapeMap.get(shapeInfo.symbol);
+                if(shapeArr == undefined){
+                    shapeArr = [];
+                    shapeMap.set(shapeInfo.symbol,shapeArr);
+                }
+                shapeArr.push({
+                    _id: shapeInfo.id,//服务端存储的数据库唯一标识
+                    draw_id: '',//界面绘图生成的id
+                    owner: shapeInfo.owner,
+                    symbol: shapeInfo.symbol,
+                    shape: shapeInfo.shape,
+                    points: JSON.parse(shapeInfo.points),
+                    properties: JSON.parse(shapeInfo.properties),
+                    draw_status: 0,//是否已在界面绘图 0：未绘图 1：已绘图
+                })
+            }
+        };
+    },
+    //保存图纸
+    saveShapeInfo: async(id) => {
+        //图纸实例
+        var iLineDataSourceApi = widget.activeChart().getShapeById(id);
+        //绘图属性
+        var properties = iLineDataSourceApi.getProperties();
+        //绘图坐标 [{price:double,time:Long}]
+        var points = iLineDataSourceApi.getPoints();
+        
+        var shape_type = shapeType.get(iLineDataSourceApi._source.toolname);
+        if(shape_type){
+            var jsonData = {
+                draw_id: id,
+                symbol: widget.activeChart().symbol(),
+                shape: iLineDataSourceApi._source.toolname,
+                points: JSON.stringify(points),
+                properties: JSON.stringify(properties),
+                draw_status: 1,
+            }
+            var result = await axios.post('/shape/saveShapeInfo',jsonData);
+            jsonData.id = result.id;
+            //console.log(result);
+            var shapeArray = shapeMap.get(jsonData.symbol);
+            if(shapeArray==undefined){
+                shapeArray = [];
+            }
+            shapeArray.push(jsonData);
+
+        }
+    },
+    //删除图纸
+    removeShapeInfo: (id) => {
+        var symbol = widget.activeChart().symbol();
+        var shapeArray = shapeMap.get(symbol);
+        if(shapeArray){
+            for(var index = 0;index < shapeArray.length;index++){
+                var shapeInfo = shapeArray[index];
+                if(shapeInfo.draw_id == id){
+                    axios.post('/shape/deleteShapeInfo/'+ shapeInfo._id);
+                }
+            }
+        }
+    },
     //图表初始化时调用该函数
     onReady: (callback) => {
         console.log('[onReady]: Method call');
@@ -99,7 +205,7 @@ export default {
             var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + symbolInfo.name + 
             '&contractType=PERPETUAL&interval=' + inervalData[resolution].toLowerCase() + '&startTime=' + (periodParams.from * 1000) 
             + '&endTime=' + (periodParams.to * 1000);
-            var response = await axios.get(url);
+            var response = await axios_.get(url);
             response.data.forEach(function(d,i){
                 newData.push({
                     time:d[0],
@@ -118,6 +224,8 @@ export default {
     subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) => {
         console.log('[subscribeBars]: Method call with subscriberUID:', subscriberUID);
         
+        drowBySymbol(symbolInfo.name)
+
         var socketClient = new WebSocket(baseWebSocketUrl + "/ws/" + symbolInfo.name.toLowerCase() + '_perpetual@continuousKline_' + inervalData[resolution].toLowerCase());
         socketClient.onopen = () => {
             console.log('WebSocket connection opened,' + socketClient.url);

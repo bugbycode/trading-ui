@@ -3,6 +3,9 @@ import { onMounted, ref, onUnmounted } from 'vue';
 import { widget } from './../../../public/charting_library';
 //import { UDFCompatibleDatafeed } from './../../../public/datafeeds/udf/src/udf-compatible-datafeed';
 import Datafeed from './../../datafeeds/binance_datafeed.js';
+
+import axios from './../../axios';
+
 function getLanguageFromURL() {
 	const regex = new RegExp('[\\?&]lang=([^&#]*)');
 	const results = regex.exec(window.location.search);
@@ -59,8 +62,9 @@ const props = defineProps({
 		type: Array,
 		default: [
 			{ text: "1d", resolution: "15", description: "1day", title: "1D"},
-			{ text: "5d", resolution: "60", description: "5day", title: "5D"},
-			{ text: "1000y", resolution: "1W", description: "All", title: "All" },
+			{ text: "1w", resolution: "240", description: "7day", title: "1W"},
+			{ text: "30d", resolution: "240", description: "30day", title: "1M"},
+			{ text: "365y", resolution: "1d", description: "All", title: "All" },
 		]
 	}
 });
@@ -75,7 +79,7 @@ onMounted(() => {
 		interval: props.interval,
 		container: chartContainer.value,
 		library_path: props.libraryPath,
-
+		volume: true,
 		locale: getLanguageFromURL() || 'en',
 		disabled_features: ['use_localstorage_for_settings'],
 		enabled_features: ['study_templates'],
@@ -91,63 +95,25 @@ onMounted(() => {
 	chartWidget = new widget(widgetOptions);
 	
 	chartWidget.onChartReady(() => {
-		chartWidget.headerReady().then(() => {
-			const button = chartWidget.createButton();
+		console.log('on chart ready.')
 
-			button.setAttribute('title', 'Click to show a notification popup');
-			button.classList.add('apply-common-tooltip');
-
-			button.addEventListener('click', () =>
-				chartWidget.showNoticeDialog({
-					title: 'Notification',
-					body: 'TradingView Charting Library API works correctly',
-					callback: () => {
-						// eslint-disable-next-line no-console
-						console.log('Noticed!');
-					},
-				})
-			);
-
-			button.innerHTML = 'Check API';
+		//在图表添加绘图时触发的事件
+		chartWidget.subscribe('drawing', (event) => {
+			console.log(`drawing type as :${event.value}`);
 		});
-		
-		chartWidget.activeChart().createMultipointShape(
-			[{"price":72144,"time":1717718400},{"price":53329.5,"time":1720137600},{"price":70081,"time":1722211200},{"price":48888,"time":1722816000},{"price":68749,"time":1729382400}],
-			{ 
-				shape:'xabcd_pattern',
-				overrides: {"color":"#2962FF","textcolor":"#ffffff","fillBackground":true,"backgroundColor":"#2962FF","fontsize":12,"bold":false,"italic":false,"transparency":85,"linewidth":1,"visible":true,"frozen":false,"intervalsVisibilities":{"ticks":true,"seconds":true,"secondsFrom":1,"secondsTo":59,"minutes":true,"minutesFrom":1,"minutesTo":59,"hours":true,"hoursFrom":1,"hoursTo":24,"days":true,"daysFrom":1,"daysTo":366,"weeks":true,"weeksFrom":1,"weeksTo":52,"months":true,"monthsFrom":1,"monthsTo":12,"ranges":true},"title":""}
+		//创建、修改、删除绘图时触发的事件
+		chartWidget.subscribe('drawing_event', (id, type) => {
+			console.log(`id:${id}, type:${type}`);
+			
+			if(type == 'create'){
+				Datafeed.saveShapeInfo(id);
+			} else if(type == 'remove'){
+				Datafeed.removeShapeInfo(id);
 			}
-		);
-		chartWidget.activeChart().createMultipointShape(
-			[{"price":73881.4,"time":1710374400}],
-			{
-				shape:'horizontal_ray',
-			}
-		)
+		});
 	});
 
-	chartWidget.subscribe('drawing', (event) => {
-		console.log(event.value);
-		/*var allShapes = chartWidget.activeChart().getAllShapes();
-		for(var index = 0;index < allShapes.length;index++){
-			var shape = chartWidget.activeChart().getShapeById(allShapes[index].id);
-			console.log(shape.id);
-			console.log(JSON.stringify(shape.getProperties()));
-			console.log(JSON.stringify(shape.getPoints()))
-		}*/
-	});
-
-	chartWidget.subscribe('drawing_event', (id, type) => {
-		if(type == 'create'){
-			console.log(chartWidget.activeChart().symbol())
-			var shape = chartWidget.activeChart().getShapeById(id);
-			console.log(shape._source.toolname);
-			console.log(JSON.stringify(shape.getProperties()));
-			console.log(JSON.stringify(shape.getPoints()))
-			console.log(shape)
-		}
-	});
-	
+	Datafeed.initDbShapeInfo(chartWidget);
 });
 
 onUnmounted(() => {
