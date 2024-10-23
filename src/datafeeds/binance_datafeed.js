@@ -231,7 +231,7 @@ export default {
             timezone: 'Asia/Shanghai',
             exchange: 'Binance exchange',
             minmov: 1,
-            pricescale: 1000000,
+            pricescale: 10000000000,
             has_intraday: true,
             visible_plots_set: 'ohlcv',
             has_weekly_and_monthly: false,
