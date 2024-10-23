@@ -16,19 +16,19 @@ export default defineConfig({
   },server: {
     proxy: {
       '/user': {
-        target: 'http://localhost:8788',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },'/shape': {
-        target: 'http://localhost:8788',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },'/login': {
-        target: 'http://localhost:8788',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },'/logout': {
-        target: 'http://localhost:8788',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },'/pairs': {
-        target: 'http://localhost:8788',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       }
     }
