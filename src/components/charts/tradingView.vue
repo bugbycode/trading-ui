@@ -22,18 +22,18 @@ const props = defineProps({
 		default: '60',
 		type: String,
 	},
-	datafeedUrl: {
+	/*datafeedUrl: {
 		default: 'https://demo_feed.tradingview.com',
 		type: String,
-	},
+	},*/
 	libraryPath: {
 		default: '/web/charting_library/',
 		type: String,
 	},
-	chartsStorageUrl: {
+	/*chartsStorageUrl: {
 		default: 'https://saveload.tradingview.com',
 		type: String,
-	},
+	},*/
 	chartsStorageApiVersion: {
 		default: '1.1',
 		type: String,
@@ -82,21 +82,23 @@ onMounted(() => {
 		locale: getLanguageFromURL() || 'en',
 		disabled_features: ['use_localstorage_for_settings'],
 		enabled_features: ['study_templates'],
-		charts_storage_url: props.chartsStorageUrl,
-		charts_storage_api_version: props.chartsStorageApiVersion,
+		/*charts_storage_url: props.chartsStorageUrl,
+		charts_storage_api_version: props.chartsStorageApiVersion,*/
 		client_id: props.clientId,
 		user_id: props.userId,
 		fullscreen: props.fullscreen,
 		autosize: props.autosize,
 		studies_overrides: props.studiesOverrides,
 		time_frames: props.time_frames,
+		timezone: "Asia/Shanghai",
 	};
 	chartWidget = new widget(widgetOptions);
-	
+
 	Datafeed.initDbShapeInfo(chartWidget);
 
 	chartWidget.onChartReady(() => {
 		console.log('on chart ready.')
+
 		//在图表添加绘图时触发的事件
 		chartWidget.subscribe('drawing', (event) => {
 			console.log(`drawing type as :${event.value}`);
