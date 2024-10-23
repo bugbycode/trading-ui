@@ -104,13 +104,8 @@ export default {
                 coinInfo.push(pair.trim());
             }
         }
-        if(call){
-            call();
-        }
-    },
-    //初始化已存储的图纸
-    initDbShapeInfo: async(chartWidget) => {
-        widget = chartWidget;
+
+        //初始化已存储的图纸
         var all_shape = await axios.get('/shape/getAllShapeInfo');
         if(all_shape && all_shape.length > 0 && all_shape[0].symbol){
             for(var index = 0;index < all_shape.length;index++){
@@ -132,6 +127,13 @@ export default {
                 })
             }
         };
+
+        if(call){
+            call();
+        }
+    },
+    initChartWidget: (chartWidget)=>{
+        widget = chartWidget;
     },
     //保存图纸
     saveShapeInfo: async(id) => {

@@ -98,7 +98,7 @@ onMounted(() => {
 		chartWidget.onChartReady(() => {
 			console.log('on chart ready.')
 			
-			Datafeed.initDbShapeInfo(chartWidget);
+			Datafeed.initChartWidget(chartWidget);
 			//在图表添加绘图时触发的事件
 			chartWidget.subscribe('drawing', (event) => {
 				console.log(`drawing type as :${event.value}`);
