@@ -30,10 +30,10 @@ const props = defineProps({
 		default: '/web/charting_library/',
 		type: String,
 	},
-	/*chartsStorageUrl: {
+	chartsStorageUrl: {
 		default: 'https://saveload.tradingview.com',
 		type: String,
-	},*/
+	},
 	chartsStorageApiVersion: {
 		default: '1.1',
 		type: String,
@@ -82,8 +82,8 @@ onMounted(() => {
 		locale: getLanguageFromURL() || 'en',
 		disabled_features: ['use_localstorage_for_settings'],
 		enabled_features: ['study_templates'],
-		/*charts_storage_url: props.chartsStorageUrl,
-		charts_storage_api_version: props.chartsStorageApiVersion,*/
+		charts_storage_url: props.chartsStorageUrl,
+		charts_storage_api_version: props.chartsStorageApiVersion,
 		client_id: props.clientId,
 		user_id: props.userId,
 		fullscreen: props.fullscreen,
