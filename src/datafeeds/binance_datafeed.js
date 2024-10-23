@@ -282,9 +282,10 @@ export default {
                 });
             })
         }
+        
         setTimeout(() => {
             loeading.close();
-            onHistoryCallback(newData);
+            onHistoryCallback(newData,{ noData: newData.length == 0 });
         }, 1000);
     },
     //实时行情订阅
