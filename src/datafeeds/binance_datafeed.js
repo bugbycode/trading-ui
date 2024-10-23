@@ -1,6 +1,7 @@
 import axios_ from 'axios';
 import axios from './../axios'
 import { generateSymbol, parseFullSymbol } from './helpers.js';
+import { ElMessage,ElLoading } from 'element-plus'
 //binance klines http url https://fapi.binance.com
 const baseHttpUrl = 'https://fapi.binance.com';
 const baseWebSocketUrl = 'wss://fstream.binance.com';
@@ -90,7 +91,7 @@ export default {
 
     drowBySymbol: drowBySymbol,
     //获取服务端配置的交易对
-    initPairsInfo: async() => {
+    initPairsInfo: async(call) => {
         var result = await axios.get('/pairs/getPairs');
         var pairs_arr = result;
         if(pairs_arr && pairs_arr.length > 0){
@@ -102,6 +103,9 @@ export default {
                 }
                 coinInfo.push(pair.trim());
             }
+        }
+        if(call){
+            call();
         }
     },
     //初始化已存储的图纸
@@ -221,7 +225,15 @@ export default {
         };
         onResultReadyCallback(dataArr)
     },
-    resolveSymbol: ( symbolName, onSymbolResolvedCallback, onResolveErrorCallback, extension ) => {
+    resolveSymbol: async ( symbolName, onSymbolResolvedCallback, onResolveErrorCallback, extension ) => {
+        console.log('resolveSymbol call.....')
+
+        var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + symbolName + 
+            '&contractType=PERPETUAL&interval=15m&limit=1';
+        var response = await axios_.get(url);
+        var price = response.data[0][3];
+        var index = price.indexOf('.');
+        var endPrice = price.substring(index + 1);
         const symbolInfo = {
             ticker: symbolName,
             name: symbolName,
@@ -231,7 +243,7 @@ export default {
             timezone: 'Asia/Shanghai',
             exchange: 'Binance exchange',
             minmov: 1,
-            pricescale: 10000000000,
+            pricescale: 100 * Math.pow(10, endPrice.length - 2),
             has_intraday: true,
             visible_plots_set: 'ohlcv',
             has_weekly_and_monthly: false,
@@ -244,8 +256,13 @@ export default {
     },
     //获取k线信息
     getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
-        
+        console.log('getBars call')
         //data.value.push({ time: '2018-12-22', open: 75.16, high: 82.84, low: 36.16, close: 45.72 })
+        var loeading = ElLoading.service({
+            lock: true,
+            text: 'Loading',
+            background: 'rgba(0, 0, 0, 0.7)',
+        })
         var newData = [];
         if(!(periodParams.from < 0 || periodParams.to < 0)){
             var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + symbolInfo.name + 
@@ -263,8 +280,10 @@ export default {
                 });
             })
         }
-        
-        onHistoryCallback(newData);
+        setTimeout(() => {
+            loeading.close();
+            onHistoryCallback(newData);
+        }, 1000);
     },
     //实时行情订阅
     subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) => {
@@ -294,6 +313,10 @@ export default {
         };
 
         socketClient.onclose = () => {
+            var client = clientMap.get(subscriberUID);
+            if(client){
+                client.init();
+            }
             console.log('WebSocket connection closed,' + socketClient.url);
         };
 
@@ -305,7 +328,8 @@ export default {
     //取消订阅
     unsubscribeBars: (subscriberUID) => {
         console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID);
-        clientMap.get(subscriberUID).close();
+        var client = clientMap.get(subscriberUID);
         clientMap.delete(subscriberUID);
+        client.close();
     },
 }

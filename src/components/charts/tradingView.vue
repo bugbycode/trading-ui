@@ -3,8 +3,6 @@ import { onMounted, ref, onUnmounted } from 'vue';
 import { widget } from './../../../public/charting_library';
 import Datafeed from './../../datafeeds/binance_datafeed.js';
 
-Datafeed.initPairsInfo();
-
 function getLanguageFromURL() {
 	const regex = new RegExp('[\\?&]lang=([^&#]*)');
 	const results = regex.exec(window.location.search);
@@ -82,7 +80,7 @@ onMounted(() => {
 		locale: getLanguageFromURL() || 'en',
 		disabled_features: ['use_localstorage_for_settings'],
 		enabled_features: ['study_templates'],
-		charts_storage_url: props.chartsStorageUrl,
+		//charts_storage_url: props.chartsStorageUrl,
 		charts_storage_api_version: props.chartsStorageApiVersion,
 		client_id: props.clientId,
 		user_id: props.userId,
@@ -92,27 +90,30 @@ onMounted(() => {
 		time_frames: props.time_frames,
 		timezone: "Asia/Shanghai",
 	};
-	chartWidget = new widget(widgetOptions);
 
-	Datafeed.initDbShapeInfo(chartWidget);
+	Datafeed.initPairsInfo(function(){
 
-	chartWidget.onChartReady(() => {
-		console.log('on chart ready.')
+		chartWidget = new widget(widgetOptions);
 
-		//在图表添加绘图时触发的事件
-		chartWidget.subscribe('drawing', (event) => {
-			console.log(`drawing type as :${event.value}`);
-		});
-		//创建、修改、删除绘图时触发的事件
-		chartWidget.subscribe('drawing_event', (id, type) => {
-			console.log(`id:${id}, type:${type}`);
-			if(type == 'create'){
-				Datafeed.saveShapeInfo(id);
-			} else if(type == 'remove'){
-				Datafeed.removeShapeInfo(id);
-			} else if(type == 'properties_changed' || type == 'points_changed'){
-				Datafeed.changeShapeInfo(id);
-			}
+		chartWidget.onChartReady(() => {
+			console.log('on chart ready.')
+			
+			Datafeed.initDbShapeInfo(chartWidget);
+			//在图表添加绘图时触发的事件
+			chartWidget.subscribe('drawing', (event) => {
+				console.log(`drawing type as :${event.value}`);
+			});
+			//创建、修改、删除绘图时触发的事件
+			chartWidget.subscribe('drawing_event', (id, type) => {
+				console.log(`id:${id}, type:${type}`);
+				if(type == 'create'){
+					Datafeed.saveShapeInfo(id);
+				} else if(type == 'remove'){
+					Datafeed.removeShapeInfo(id);
+				} else if(type == 'properties_changed' || type == 'points_changed'){
+					Datafeed.changeShapeInfo(id);
+				}
+			});
 		});
 	});
 
