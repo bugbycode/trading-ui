@@ -277,37 +277,40 @@ export default {
         
     },
     //获取k线信息
-    getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
+    getBars: (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
         console.log('getBars call')
         //data.value.push({ time: '2018-12-22', open: 75.16, high: 82.84, low: 36.16, close: 45.72 })
-        var loeading = ElLoading.service({
-            lock: true,
-            text: 'Loading',
-            background: 'rgba(0, 0, 0, 0.7)',
-        })
-        var newData = [];
+        
         if(!(periodParams.from < 0 || periodParams.to < 0)){
+            var newData = [];
+            var loeading = ElLoading.service({
+                lock: true,
+                text: 'Loading',
+                background: 'rgba(0, 0, 0, 0.7)',
+            })
             var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + symbolInfo.name + 
             '&contractType=PERPETUAL&interval=' + inervalData[resolution].toLowerCase() + '&startTime=' + (periodParams.from * 1000) 
             + '&endTime=' + (periodParams.to * 1000);
-            var response = await axios_.get(url);
-            response.data.forEach(function(d,i){
-                newData.push({
-                    time:d[0],
-                    open:Number(d[1]),
-                    high:Number(d[2]),
-                    low:Number(d[3]),
-                    close:Number(d[4]),
-                    volume: Number(d[5]),
-                });
-            })
-            drowBySymbol(symbolInfo.name,periodParams.from);
+            axios_.get(url).then(function(response){
+                response.data.forEach(function(d,i){
+                    newData.push({
+                        time:d[0],
+                        open:Number(d[1]),
+                        high:Number(d[2]),
+                        low:Number(d[3]),
+                        close:Number(d[4]),
+                        volume: Number(d[5]),
+                    });
+                })
+                drowBySymbol(symbolInfo.name,periodParams.from);
+                loeading.close();
+                onHistoryCallback(newData,{ noData: newData.length == 0 });
+            }).catch(function(e){
+                loeading.close();
+                onHistoryCallback(newData,{ noData: newData.length == 0 });
+                ElMessage.error({message: e, offset: (window.innerHeight / 2)});
+            });
         }
-        
-        setTimeout(() => {
-            loeading.close();
-            onHistoryCallback(newData,{ noData: newData.length == 0 });
-        }, 1000);
     },
     //实时行情订阅
     subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) => {
