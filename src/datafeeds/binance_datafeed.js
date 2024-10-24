@@ -148,7 +148,7 @@ export default {
         widget = chartWidget;
     },
     //保存图纸
-    saveShapeInfo: async(id) => {
+    saveShapeInfo: (id) => {
         //图纸实例
         var iLineDataSourceApi = widget.activeChart().getShapeById(id);
         //绘图属性
@@ -166,14 +166,17 @@ export default {
                 properties: JSON.stringify(properties),
                 draw_status: 1,
             }
-            var result = await axios.post('/shape/saveShapeInfo',jsonData);
-            jsonData._id = result.id;
-            //console.log(result);
-            var shapeArray = shapeMap.get(jsonData.symbol);
-            if(shapeArray==undefined){
-                shapeArray = [];
-            }
-            shapeArray.push(jsonData);
+            axios.post('/shape/saveShapeInfo',jsonData).then(function(result){
+                jsonData._id = result.id;
+                var shapeArray = shapeMap.get(jsonData.symbol);
+                if(!shapeArray){
+                    shapeArray = [];
+                    shapeMap.set(jsonData.symbol,shapeArray);
+                }
+                shapeArray.push(jsonData);
+            }).catch(function(e){
+                console.log(e);
+            });
 
         }
     },
@@ -204,7 +207,8 @@ export default {
         if(shapeArray){
             for(var index = 0;index < shapeArray.length;index++){
                 var shapeInfo = shapeArray[index];
-                if(shapeInfo.draw_id == id && shapeInfo._id != ''){
+                console.log(shapeInfo._id);
+                if(shapeInfo.draw_id == id && shapeInfo._id && shapeInfo._id != ''){
                     shapeInfo.id = shapeInfo._id;
                     shapeInfo.properties = JSON.stringify(properties);
                     shapeInfo.points = JSON.stringify(points);
