@@ -93,6 +93,8 @@ export default {
     //获取服务端配置的交易对
     initPairsInfo: async(call) => {
         
+        var cfg = await axios.get('/tradingview/getConfig');
+
         //获取币安合约所有交易对
         axios_.get(baseHttpUrl + '/fapi/v1/exchangeInfo').then(function(result){
             if(result && result.status == 200){
@@ -131,15 +133,16 @@ export default {
                     })
                 }
             };
+
+            if(call){
+                call(cfg);
+            }
+
         }).catch(function(e){
             console.log(e);
-        });
-
-        var cfg = await axios.get('/tradingview/getConfig');
-
-        if(call){
             call(cfg);
-        }
+        });
+        
     },
     initChartWidget: (chartWidget)=>{
         widget = chartWidget;
@@ -188,7 +191,7 @@ export default {
         }
     },
     //修改图纸
-    changeShapeInfo: async(id) => {
+    changeShapeInfo: (id) => {
         var symbol = widget.activeChart().symbol();
         //图纸实例
         var iLineDataSourceApi = widget.activeChart().getShapeById(id);
@@ -205,7 +208,11 @@ export default {
                     shapeInfo.id = shapeInfo._id;
                     shapeInfo.properties = JSON.stringify(properties);
                     shapeInfo.points = JSON.stringify(points);
-                    await axios.post('/shape/updateShapeInfo',shapeInfo);
+                    axios.post('/shape/updateShapeInfo',shapeInfo).then(function(result){
+                        console.log(result)
+                    }).catch(function(e){
+                        console.log(e);
+                    });
                 }
             }
         }
