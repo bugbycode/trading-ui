@@ -27,7 +27,7 @@ export default defineConfig({
       },'/logout': {
         target: 'http://localhost:8080',
         changeOrigin: true,
-      },'/pairs': {
+      },'/tradingview': {
         target: 'http://localhost:8080',
         changeOrigin: true,
       }

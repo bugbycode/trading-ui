@@ -92,44 +92,53 @@ export default {
     drowBySymbol: drowBySymbol,
     //获取服务端配置的交易对
     initPairsInfo: async(call) => {
-        var result = await axios.get('/pairs/getPairs');
-        var pairs_arr = result;
-        if(pairs_arr && pairs_arr.length > 0){
-            coinInfo = [];
-            for(var index = 0;index < pairs_arr.length;index++){
-                var pair = pairs_arr[index];
-                if(pair.trim() == ''){
-                    continue;
+        
+        //获取币安合约所有交易对
+        axios_.get(baseHttpUrl + '/fapi/v1/exchangeInfo').then(function(result){
+            if(result && result.status == 200){
+                coinInfo = [];
+                var symbols = result.data.symbols;
+                for(var index = 0;index < symbols.length;index++){
+                    if(symbols[index].contractType == 'PERPETUAL' && symbols[index].status == 'TRADING'){
+                        //console.log(JSON.stringify(symbols[index]))
+                        coinInfo.push(symbols[index].symbol)
+                    }
                 }
-                coinInfo.push(pair.trim());
             }
-        }
-
+        }).catch(function(e){
+            console.log(e);
+        });
+        
         //初始化已存储的图纸
-        var all_shape = await axios.get('/shape/getAllShapeInfo');
-        if(all_shape && all_shape.length > 0 && all_shape[0].symbol){
-            for(var index = 0;index < all_shape.length;index++){
-                var shapeInfo = all_shape[index];
-                var shapeArr = shapeMap.get(shapeInfo.symbol);
-                if(shapeArr == undefined){
-                    shapeArr = [];
-                    shapeMap.set(shapeInfo.symbol,shapeArr);
+        axios.get('/shape/getAllShapeInfo').then(function(all_shape){
+            if(all_shape && all_shape.length > 0 && all_shape[0].symbol){
+                for(var index = 0;index < all_shape.length;index++){
+                    var shapeInfo = all_shape[index];
+                    var shapeArr = shapeMap.get(shapeInfo.symbol);
+                    if(shapeArr == undefined){
+                        shapeArr = [];
+                        shapeMap.set(shapeInfo.symbol,shapeArr);
+                    }
+                    shapeArr.push({
+                        _id: shapeInfo.id,//服务端存储的数据库唯一标识
+                        draw_id: '',//界面绘图生成的id
+                        owner: shapeInfo.owner,
+                        symbol: shapeInfo.symbol,
+                        shape: shapeInfo.shape,
+                        points: JSON.parse(shapeInfo.points),
+                        properties: JSON.parse(shapeInfo.properties),
+                        draw_status: 0,//是否已在界面绘图 0：未绘图 1：已绘图
+                    })
                 }
-                shapeArr.push({
-                    _id: shapeInfo.id,//服务端存储的数据库唯一标识
-                    draw_id: '',//界面绘图生成的id
-                    owner: shapeInfo.owner,
-                    symbol: shapeInfo.symbol,
-                    shape: shapeInfo.shape,
-                    points: JSON.parse(shapeInfo.points),
-                    properties: JSON.parse(shapeInfo.properties),
-                    draw_status: 0,//是否已在界面绘图 0：未绘图 1：已绘图
-                })
-            }
-        };
+            };
+        }).catch(function(e){
+            console.log(e);
+        });
+
+        var cfg = await axios.get('/tradingview/getConfig');
 
         if(call){
-            call();
+            call(cfg);
         }
     },
     initChartWidget: (chartWidget)=>{
@@ -249,7 +258,7 @@ export default {
             has_intraday: true,
             visible_plots_set: 'ohlcv',
             has_weekly_and_monthly: false,
-            supported_resolutions: ["1","5","15","60","240","1D", "1W", "1M",],
+            supported_resolutions: ["1","5","15","60","240","1D"/*, "1W", "1M",*/],
             volume_precision: 2,
             data_status: 'streaming',
         };
@@ -292,6 +301,15 @@ export default {
     subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) => {
         console.log('[subscribeBars]: Method call with subscriberUID:', subscriberUID);
         
+        axios.post('/tradingview/save',{
+            inerval: resolution,
+            symbol: symbolInfo.name,
+        }).then(function(result){
+            console.log(result);
+        }).catch(function(e){
+            console.log(e)
+        })
+
         setTimeout(() => {
             drowBySymbol(symbolInfo.name);
         }, 500);

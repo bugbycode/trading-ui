@@ -91,8 +91,12 @@ onMounted(() => {
 		timezone: "Asia/Shanghai",
 	};
 
-	Datafeed.initPairsInfo(function(){
-
+	Datafeed.initPairsInfo(function(cfg){
+		//console.log(cfg);
+		if(cfg){
+			widgetOptions.symbol = cfg.symbol;
+			widgetOptions.interval = cfg.inerval;
+		}
 		chartWidget = new widget(widgetOptions);
 
 		chartWidget.onChartReady(() => {
@@ -120,7 +124,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-	if (chartWidget !== null) {
+	if (chartWidget) {
 		chartWidget.remove();
 		chartWidget = null;
 	}
