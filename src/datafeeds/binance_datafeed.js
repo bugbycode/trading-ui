@@ -60,7 +60,7 @@ shapeType.set('LineToolFixedRangeVolumeProfile','fixed_range_volume_profile')//�
 var widget = null;
 var shapeMap = new Map();
 //画图
-const drowBySymbol = (symbol) => {
+const drowBySymbol = (symbol,time) => {
     var shapeArr = shapeMap.get(symbol);
 	//console.log(`drow : ${symbol}`)
     //console.log(shapeArr)
@@ -69,7 +69,7 @@ const drowBySymbol = (symbol) => {
 			var shapeInfo = shapeArr[index];
 			var shape_type = shapeType.get(shapeInfo.shape);
 			if(shape_type){
-				if(shapeInfo.draw_status == 0){
+				if(shapeInfo.draw_status == 0 && time <= shapeInfo.points[0].time && widget){
 					var entityId = widget.activeChart().createMultipointShape(
 						shapeInfo.points,
 						{
@@ -297,6 +297,7 @@ export default {
                     volume: Number(d[5]),
                 });
             })
+            drowBySymbol(symbolInfo.name,periodParams.from);
         }
         
         setTimeout(() => {
@@ -316,10 +317,6 @@ export default {
         }).catch(function(e){
             console.log(e)
         })
-
-        setTimeout(() => {
-            drowBySymbol(symbolInfo.name);
-        }, 500);
 
         var socketClient = new WebSocket(baseWebSocketUrl + "/ws/" + symbolInfo.name.toLowerCase() + '_perpetual@continuousKline_' + inervalData[resolution].toLowerCase());
         socketClient.onopen = () => {
