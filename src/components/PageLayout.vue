@@ -16,7 +16,7 @@
 </template>
 <style scoped>
 .header{
-    background-color: aliceblue;
+    background-color: #131722;
 }
 .main{
     padding: 0px;

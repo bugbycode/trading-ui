@@ -3,7 +3,7 @@
         <el-col :span="12">
             <ul class="lineH-right headUl">
                 <el-text class="headerTitle">
-                    <el-icon><PieChart /></el-icon> 永续合约交易分析平台
+                    <el-icon style="vertical-align: -5px;"><PieChart /></el-icon> 数字货币永续合约分析平台
                 </el-text>
             </ul>
         </el-col>
@@ -19,6 +19,7 @@
     </el-row>
 </template>
 <script setup>
+    import { ElMessageBox } from 'element-plus'
     import { useRoute, useRouter } from 'vue-router'
 
     import {ref, onMounted} from 'vue'
@@ -39,22 +40,36 @@
     }
 
     const logout = async() => {
-        axios.get('/logout').then(function(result){
-            router.push('/login')
-        }).catch(function(err){
-            console.log(err);
-            router.push('/login')
-        });
+        ElMessageBox.confirm(
+        '确定要退出登录吗？',
+        '温馨提示',
+        {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning',
+        }
+        ).then(() => {
+            axios.get('/logout').then(function(result){
+                router.push('/login')
+            }).catch(function(err){
+                console.log(err);
+                router.push('/login')
+            });
+        })
+        .catch(() => {
+            
+        })
+        
     }
 </script>
 <style scoped>
+
 .headUl{
     padding-left: 0px;
 }
 .headerTitle{
     font-weight: bolder;
-    font-family: 楷体;
-    color: black;
+    font-family: 隶书;
     padding: 0px;
     font-size: 30px;
 }
@@ -62,7 +77,6 @@
     float: right;
 }
 .userInfo{
-    color: black;
     font-size: 20px;
 }
 .handStyle{
