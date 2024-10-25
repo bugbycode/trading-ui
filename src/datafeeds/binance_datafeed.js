@@ -302,11 +302,16 @@ export default {
                         volume: Number(d[5]),
                     });
                 })
-                drowBySymbol(symbolInfo.name,periodParams.from);
+                
                 loeading.close();
                 onHistoryCallback(newData,{ noData: newData.length == 0 });
+
+                setTimeout(() => {
+                    drowBySymbol(symbolInfo.name,periodParams.from);
+                }, 1000);
             }).catch(function(e){
                 loeading.close();
+                console.log(e);
                 onHistoryCallback(newData,{ noData: newData.length == 0 });
                 ElMessage.error({message: e, offset: (window.innerHeight / 2)});
             });
