@@ -71,6 +71,7 @@ let chartWidget;
 
 onMounted(() => {
 	const widgetOptions = {
+		theme: "Dark",
 		symbol: props.symbol,
 		datafeed: Datafeed, //new UDFCompatibleDatafeed(props.datafeedUrl),
 		interval: props.interval,
@@ -86,9 +87,9 @@ onMounted(() => {
 		user_id: props.userId,
 		fullscreen: props.fullscreen,
 		autosize: props.autosize,
-		studies_overrides: props.studiesOverrides,
 		time_frames: props.time_frames,
 		timezone: "Asia/Shanghai",
+		studies_overrides: props.studiesOverrides,
 	};
 
 	Datafeed.initPairsInfo(function(cfg){
@@ -138,5 +139,8 @@ onUnmounted(() => {
 <style scoped>
 .TVChartContainer {
 	height: calc(100vh - 63px);
+}
+.handStyle{
+    cursor: pointer
 }
 </style>
