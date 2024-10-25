@@ -50,15 +50,8 @@
     const route = useRoute()
     
     onMounted(() =>{
-      checkLoginStatus();
+      
     })
-
-    const checkLoginStatus = async() => {
-      var user = await axios.get('/user/userInfo');
-      if(user && user.username){
-          router.push('/')
-      }
-    }
 
     //登录表单信息
     var userInput = ref('');
@@ -76,17 +69,21 @@
         const formData = new FormData();
         formData.append('username', username.trim());
         formData.append('password', password);
-        var result = await axios.post('/login',formData,{
+        axios.post('/login',formData,{
           headers: {
             'Content-Type': 'multipart/form-data' // 明确指定 Content-Type
           }
+        }).then(function(result){
+          //console.log(result)
+          if(result.status == 200){
+            router.push('/')
+          } else {
+            ElMessage.error({message: result.message, offset: (window.innerHeight / 2)});
+          }
+        }).catch(function(e){
+          ElMessage.error({message: e, offset: (window.innerHeight / 2)});
         })
-        //console.log(result)
-        if(result.status == 200){
-          router.push('/')
-        } else {
-          ElMessage.error({message: result.message, offset: (window.innerHeight / 2)});
-        }
+        
       }
       
     }

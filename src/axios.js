@@ -6,7 +6,7 @@ var loading = null;
 // 创建 Axios 实例，设置基础 URL 和超时
 const instance = axios.create({
   //baseURL: '/api', // 这里的 /api 是代理前缀
-  //timeout: 5000,    // 请求超时时间
+  timeout: 5000,    // 请求超时时间
   withCredentials: true,
   //maxRedirects: 0, // 禁用自动重定向
 });
@@ -50,7 +50,7 @@ instance.interceptors.response.use(
     if(loading) {
       loading.close();
     }
-    console.log(error);
+    //console.log(error);
     if(response){
       ElMessage.error({message: response.statusText, offset: (window.innerHeight / 2)});
       return {status: 500,message:response.statusText};

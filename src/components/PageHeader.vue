@@ -27,27 +27,24 @@
     const router = useRouter()
 
     onMounted(()=>{
-        checkLoginStatus();
         getUserInfo();
     })
 
-    const getUserInfo = async () =>{
-        
-        var user = await axios.get('/user/userInfo');
-        //console.log(user);
-        username.value = user.username;
-    }
-
-    const checkLoginStatus = async() => {
-      var user = await axios.get('/user/userInfo');
-      if(!(user && user.username)){
-          router.push('/login')
-      }
+    const getUserInfo = () =>{
+        axios.get('/user/userInfo').then(function(result){
+            username.value = result.username;
+        }).catch(function(err){
+            
+        })
     }
 
     const logout = async() => {
-        await axios.get('/logout');
-        checkLoginStatus()
+        axios.get('/logout').then(function(result){
+            router.push('/login')
+        }).catch(function(err){
+            console.log(err);
+            router.push('/login')
+        });
     }
 </script>
 <style scoped>
