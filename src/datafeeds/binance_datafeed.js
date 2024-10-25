@@ -352,7 +352,9 @@ export default {
         socketClient.onclose = () => {
             var client = clientMap.get(subscriberUID);
             if(client){
-                client.init();
+                clientMap.delete(subscriberUID);
+                client = new WebSocket(socketClient.url);
+                clientMap.set(subscriberUID, client);
             }
             console.log('WebSocket connection closed,' + socketClient.url);
         };

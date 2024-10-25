@@ -15,11 +15,15 @@ const instance = axios.create({
 instance.interceptors.request.use(
   config => {
     const timestamp = new Date().getTime();
-    loading = ElLoading.service({
-      lock: true,
-      text: 'Loading',
-      background: 'rgba(0, 0, 0, 0.7)',
-    })
+
+    const url = config.url;
+    if(url != '/user/userInfo'){
+      loading = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+      })
+    }
     // 如果请求已经带有params，直接追加时间戳
     if (config.params) {
       config.params.t = timestamp;

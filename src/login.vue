@@ -11,13 +11,13 @@
 
       <div class="inputBox"> 
 
-       <input type="text" v-model="userInput" required> <i>账号</i> 
+       <input type="text" @keyup.enter="login" v-model="userInput" required> <i>账号</i> 
 
       </div> 
 
       <div class="inputBox"> 
 
-       <input type="password" v-model="passInput" required> <i>密码</i> 
+       <input type="password" @keyup.enter="login" v-model="passInput" required> <i>密码</i> 
 
       </div> 
       <!--

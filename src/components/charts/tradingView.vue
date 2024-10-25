@@ -2,6 +2,11 @@
 import { onMounted, ref, onUnmounted } from 'vue';
 import { widget } from './../../../public/charting_library';
 import Datafeed from './../../datafeeds/binance_datafeed.js';
+import axios from './../../axios';
+
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 function getLanguageFromURL() {
 	const regex = new RegExp('[\\?&]lang=([^&#]*)');
@@ -110,6 +115,13 @@ onMounted(() => {
 			});
 			//创建、修改、删除绘图时触发的事件
 			chartWidget.subscribe('drawing_event', (id, type) => {
+				axios.get('/user/userInfo').then(function(result){
+					if(!(result && result.username)){
+						router.push('/login')
+					}
+				}).catch(function(e){
+					router.push('/login');
+				})
 				console.log(`id:${id}, type:${type}`);
 				if(type == 'create'){
 					Datafeed.saveShapeInfo(id);
