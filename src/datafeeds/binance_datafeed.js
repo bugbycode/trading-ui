@@ -62,8 +62,6 @@ var shapeMap = new Map();
 //画图
 const drowBySymbol = (symbol,time) => {
     var shapeArr = shapeMap.get(symbol);
-	//console.log(`drow : ${symbol}`)
-    //console.log(shapeArr)
 	if(shapeArr){
 		for(var index = 0;index < shapeArr.length;index++){
 			var shapeInfo = shapeArr[index];
@@ -101,7 +99,6 @@ export default {
                 var symbols = result.data.symbols;
                 for(var index = 0;index < symbols.length;index++){
                     if(symbols[index].contractType == 'PERPETUAL' && symbols[index].status == 'TRADING'){
-                        //console.log(JSON.stringify(symbols[index]))
                         coinInfo.push(symbols[index].symbol)
                     }
                 }
@@ -154,7 +151,6 @@ export default {
         var properties = iLineDataSourceApi.getProperties();
         //绘图坐标 [{price:double,time:Long}]
         var points = iLineDataSourceApi.getPoints();
-        console.log(iLineDataSourceApi)
         var shape_type = shapeType.get(iLineDataSourceApi._source.toolname);
         if(shape_type){
             var jsonData = {
@@ -206,13 +202,12 @@ export default {
         if(shapeArray){
             for(var index = 0;index < shapeArray.length;index++){
                 var shapeInfo = shapeArray[index];
-                console.log(shapeInfo._id);
                 if(shapeInfo.draw_id == id && shapeInfo._id && shapeInfo._id != ''){
                     shapeInfo.id = shapeInfo._id;
                     shapeInfo.properties = JSON.stringify(properties);
                     shapeInfo.points = JSON.stringify(points);
                     axios.post('/shape/updateShapeInfo',shapeInfo).then(function(result){
-                        console.log(result)
+                        
                     }).catch(function(e){
                         console.log(e);
                     });
@@ -246,33 +241,36 @@ export default {
         };
         onResultReadyCallback(dataArr)
     },
-    resolveSymbol: async ( symbolName, onSymbolResolvedCallback, onResolveErrorCallback, extension ) => {
+    resolveSymbol: ( symbolName, onSymbolResolvedCallback, onResolveErrorCallback, extension ) => {
         console.log('resolveSymbol call.....')
 
         var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + symbolName + 
             '&contractType=PERPETUAL&interval=15m&limit=1';
-        var response = await axios_.get(url);
-        var price = response.data[0][3];
-        var index = price.indexOf('.');
-        var endPrice = price.substring(index + 1);
-        const symbolInfo = {
-            ticker: symbolName,
-            name: symbolName,
-            description: symbolName,
-            type: 'crypto',
-            session: '24x7',
-            timezone: 'Asia/Shanghai',
-            exchange: 'Binance exchange',
-            minmov: 1,
-            pricescale: 100 * Math.pow(10, endPrice.length - 2),
-            has_intraday: true,
-            visible_plots_set: 'ohlcv',
-            has_weekly_and_monthly: false,
-            supported_resolutions: ["1","5","15","60","240","1D"/*, "1W", "1M",*/],
-            volume_precision: 2,
-            data_status: 'streaming',
-        };
-        setTimeout(() => onSymbolResolvedCallback(symbolInfo));
+        axios_.get(url).then(function(response){
+            var price = response.data[0][3];
+            var index = price.indexOf('.');
+            var endPrice = price.substring(index + 1);
+            const symbolInfo = {
+                ticker: symbolName,
+                name: symbolName,
+                description: symbolName,
+                type: 'crypto',
+                session: '24x7',
+                timezone: 'Asia/Shanghai',
+                exchange: 'Binance exchange',
+                minmov: 1,
+                pricescale: 100 * Math.pow(10, endPrice.length - 2),
+                has_intraday: true,
+                visible_plots_set: 'ohlcv',
+                has_weekly_and_monthly: false,
+                supported_resolutions: ["1","5","15","60","240","1D"/*, "1W", "1M",*/],
+                volume_precision: 2,
+                data_status: 'streaming',
+            };
+            onSymbolResolvedCallback(symbolInfo);
+        }).catch(function(err){
+            onResolveErrorCallback(err);
+        });
         
     },
     //获取k线信息
@@ -310,9 +308,8 @@ export default {
                 }, 1000);
             }).catch(function(e){
                 loeading.close();
-                console.log(e);
-                onHistoryCallback(newData,{ noData: newData.length == 0 });
                 ElMessage.error({message: e, offset: (window.innerHeight / 2)});
+                onErrorCallback(e);
             });
         }
     },
@@ -324,7 +321,7 @@ export default {
             inerval: resolution,
             symbol: symbolInfo.name,
         }).then(function(result){
-            console.log(result);
+            
         }).catch(function(e){
             console.log(e)
         })

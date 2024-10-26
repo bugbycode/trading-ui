@@ -112,7 +112,7 @@ onMounted(() => {
 			Datafeed.initChartWidget(chartWidget);
 			//在图表添加绘图时触发的事件
 			chartWidget.subscribe('drawing', (event) => {
-				console.log(`drawing type as :${event.value}`);
+				//console.log(`drawing type as :${event.value}`);
 			});
 			//创建、修改、删除绘图时触发的事件
 			chartWidget.subscribe('drawing_event', (id, type) => {
@@ -123,7 +123,7 @@ onMounted(() => {
 				}).catch(function(e){
 					router.push('/login');
 				})
-				console.log(`id:${id}, type:${type}`);
+				//console.log(`id:${id}, type:${type}`);
 				if(type == 'create'){
 					Datafeed.saveShapeInfo(id);
 				} else if(type == 'remove'){
