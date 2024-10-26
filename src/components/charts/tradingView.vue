@@ -3,7 +3,7 @@ import { onMounted, ref, onUnmounted } from 'vue';
 import { widget } from './../../../public/charting_library';
 import Datafeed from './../../datafeeds/binance_datafeed.js';
 import axios from './../../axios';
-
+import { ElLoading } from 'element-plus'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -104,11 +104,20 @@ onMounted(() => {
 			widgetOptions.symbol = cfg.symbol;
 			widgetOptions.interval = cfg.inerval;
 		}
+
+		var loading = ElLoading.service({
+			lock: true,
+			text: 'Loading',
+			background: 'rgba(0, 0, 0, 0.7)',
+		})
+
 		chartWidget = new widget(widgetOptions);
 
 		chartWidget.onChartReady(() => {
 			console.log('on chart ready.')
-			
+			if(loading) {
+				loading.close();
+			}
 			Datafeed.initChartWidget(chartWidget);
 			//在图表添加绘图时触发的事件
 			chartWidget.subscribe('drawing', (event) => {
