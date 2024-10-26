@@ -89,7 +89,6 @@ const drowBySymbol = (symbol,time) => {
 
 export default {
 
-    drowBySymbol: drowBySymbol,
     //获取服务端配置的交易对
     initPairsInfo: async(call) => {
         
@@ -329,8 +328,11 @@ export default {
         }).catch(function(e){
             console.log(e)
         })
-
+        
         var socketClient = new WebSocket(baseWebSocketUrl + "/ws/" + symbolInfo.name.toLowerCase() + '_perpetual@continuousKline_' + inervalData[resolution].toLowerCase());
+        
+        clientMap.set(subscriberUID,socketClient);
+        
         socketClient.onopen = () => {
             console.log('WebSocket connection opened,' + socketClient.url);
         };
@@ -350,25 +352,20 @@ export default {
         };
 
         socketClient.onclose = () => {
-            var client = clientMap.get(subscriberUID);
-            if(client){
-                clientMap.delete(subscriberUID);
-                client = new WebSocket(socketClient.url);
-                clientMap.set(subscriberUID, client);
-            }
             console.log('WebSocket connection closed,' + socketClient.url);
         };
 
         socketClient.onerror = (error) => {
             console.error('WebSocket error:', error);
         };
-        clientMap.set(subscriberUID,socketClient);
     },
     //取消订阅
     unsubscribeBars: (subscriberUID) => {
         console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID);
         var client = clientMap.get(subscriberUID);
-        clientMap.delete(subscriberUID);
-        client.close();
+        if(client){
+            clientMap.delete(subscriberUID);
+            client.close();
+        }
     },
 }

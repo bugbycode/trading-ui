@@ -30,7 +30,7 @@ const props = defineProps({
 		type: String,
 	},*/
 	libraryPath: {
-		default: '/web/charting_library/',
+		default: window.location.pathname + '/charting_library/',
 		type: String,
 	},
 	chartsStorageUrl: {
@@ -83,13 +83,14 @@ onMounted(() => {
 		container: chartContainer.value,
 		library_path: props.libraryPath,
 		volume: true,
-		locale: getLanguageFromURL() || 'en',
+		locale: 'en',
+		//locale: getLanguageFromURL() || 'en',
 		//disabled_features: ['use_localstorage_for_settings'],
 		//enabled_features: ['study_templates'],
 		//charts_storage_url: props.chartsStorageUrl,
-		charts_storage_api_version: props.chartsStorageApiVersion,
-		client_id: props.clientId,
-		user_id: props.userId,
+		//charts_storage_api_version: props.chartsStorageApiVersion,
+		//client_id: props.clientId,
+		//user_id: props.userId,
 		fullscreen: props.fullscreen,
 		autosize: props.autosize,
 		time_frames: props.time_frames,
