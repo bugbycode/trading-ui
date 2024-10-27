@@ -86,6 +86,11 @@ const drowBySymbol = (symbol,time) => {
 }
 
 const continuousKlines = (pair,interval,startTime,endTime,limit,call) => {
+    var loading = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+    })
     var newData = [];
     var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + pair + 
             '&contractType=PERPETUAL&interval=' + interval + '&startTime=' + startTime 
@@ -105,9 +110,11 @@ const continuousKlines = (pair,interval,startTime,endTime,limit,call) => {
         if(call){
             call(newData);
         }
+        loading.close();
     }).catch(function(err){
         call(newData);
         console.error(err);
+        loading.close();
         ElMessage.error({message: err, offset: (window.innerHeight / 2) - 50});
     });
     
