@@ -11,7 +11,7 @@
             <ul class="userIcon">
                 <el-text class="userInfo">
                 <el-icon><UserFilled /></el-icon>
-                <span class="handStyle usernameStyle" @click="dialogFormVisible = true">{{username}}</span>
+                <span class="handStyle usernameStyle" @click="dialogFormVisible = true">{{maskEmail(username)}}</span>
                 <el-icon class="handStyle" @click="logout"><Lock /></el-icon>
             </el-text>
             </ul>
@@ -21,13 +21,13 @@
     <el-dialog v-model="dialogFormVisible" title="重置密码" width="500">
         <el-form :model="form">
             <el-form-item label="旧密码" :label-width="formLabelWidth" >
-                <el-input type="password" v-model="form.oldPwd" placeholder="请输入旧密码" autocomplete="off" show-password clearable/>
+                <el-input @keyup.enter="changePwd" type="password" v-model="form.oldPwd" placeholder="请输入旧密码" autocomplete="off" show-password clearable/>
             </el-form-item>
             <el-form-item label="新密码" :label-width="formLabelWidth">
-                <el-input type="password" v-model="form.newPwd" placeholder="请输入新密码" autocomplete="off" show-password clearable/>
+                <el-input @keyup.enter="changePwd" type="password" v-model="form.newPwd" placeholder="请输入新密码" autocomplete="off" show-password clearable/>
             </el-form-item>
             <el-form-item label="确认密码" :label-width="formLabelWidth">
-                <el-input type="password" v-model="form.confirmPwd" placeholder="请确认新密码" autocomplete="off" show-password clearable/>
+                <el-input @keyup.enter="changePwd" type="password" v-model="form.confirmPwd" placeholder="请确认新密码" autocomplete="off" show-password clearable/>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -100,14 +100,12 @@
     }
 
     const logout = async() => {
-        ElMessageBox.confirm(
-        '确定要退出登录吗？',
-        '温馨提示',
-        {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'warning',
-        }
+        ElMessageBox.confirm( '确定要退出登录吗？', '温馨提示',
+            {
+                confirmButtonText: '确认',
+                cancelButtonText: '取消',
+                type: 'warning',
+            }
         ).then(() => {
             axios.get('/logout').then(function(result){
                 router.push('/login')
@@ -115,11 +113,15 @@
                 console.log(err);
                 router.push('/login')
             });
-        })
-        .catch(() => {
+        }).catch(() => {
             
         })
         
+    }
+
+    const maskEmail = (email) => {
+      const [username, domain] = email.split('@');
+      return `${username.slice(0, 3)}***@${domain}`;
     }
 </script>
 <style scoped>
