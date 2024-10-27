@@ -27,10 +27,10 @@ const inervalData = {
     "1":"1m",
     "5":"5m",
     "15":"15m",
-    "60":"1H",
-    "240":"4H",
-    "1D":"1D",
-    "1W":"1W",
+    "60":"1h",
+    "240":"4h",
+    "1D":"1d",
+    "1W":"1w",
     "1M":"1M",
 };
 
@@ -83,6 +83,34 @@ const drowBySymbol = (symbol,time) => {
 			}
 		}
 	}
+}
+
+const continuousKlines = (pair,interval,startTime,endTime,limit,call) => {
+    var newData = [];
+    var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + pair + 
+            '&contractType=PERPETUAL&interval=' + interval + '&startTime=' + startTime 
+            + '&endTime=' + endTime + '&limit=' + limit;
+    axios_.get(url).then(function(response){
+        response.data.forEach(function(d,i){
+            newData.push({
+                time:d[0],
+                open:Number(d[1]),
+                high:Number(d[2]),
+                low:Number(d[3]),
+                close:Number(d[4]),
+                volume: Number(d[5]),
+                closeTime: d[6],
+            });
+        })
+        if(call){
+            call(newData);
+        }
+    }).catch(function(err){
+        call(newData);
+        console.error(err);
+        ElMessage.error({message: err, offset: (window.innerHeight / 2) - 50});
+    });
+    
 }
 
 export default {
@@ -210,6 +238,7 @@ export default {
                         
                     }).catch(function(e){
                         console.log(e);
+                        ElMessage.error({message: e, offset: (window.innerHeight / 2) - 50});
                     });
                 }
             }
@@ -263,54 +292,48 @@ export default {
                 has_intraday: true,
                 visible_plots_set: 'ohlcv',
                 has_weekly_and_monthly: false,
-                supported_resolutions: ["1","5","15","60","240","1D"/*, "1W", "1M",*/],
+                supported_resolutions: ["1","5","15","60","240","1D", "1W", "1M",],
                 volume_precision: 2,
                 data_status: 'streaming',
             };
             onSymbolResolvedCallback(symbolInfo);
         }).catch(function(err){
             onResolveErrorCallback(err);
+            ElMessage.error({message: err, offset: (window.innerHeight / 2) - 50});
         });
         
     },
     //获取k线信息
     getBars: (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
         console.log('getBars call')
-        //data.value.push({ time: '2018-12-22', open: 75.16, high: 82.84, low: 36.16, close: 45.72 })
         
         if(!(periodParams.from < 0 || periodParams.to < 0)){
-            var newData = [];
-            var loeading = ElLoading.service({
-                lock: true,
-                text: 'Loading',
-                background: 'rgba(0, 0, 0, 0.7)',
-            })
-            var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + symbolInfo.name + 
-            '&contractType=PERPETUAL&interval=' + inervalData[resolution].toLowerCase() + '&startTime=' + (periodParams.from * 1000) 
-            + '&endTime=' + (periodParams.to * 1000);
-            axios_.get(url).then(function(response){
-                response.data.forEach(function(d,i){
-                    newData.push({
-                        time:d[0],
-                        open:Number(d[1]),
-                        high:Number(d[2]),
-                        low:Number(d[3]),
-                        close:Number(d[4]),
-                        volume: Number(d[5]),
-                    });
-                })
-                
-                loeading.close();
-                onHistoryCallback(newData,{ noData: newData.length == 0 });
 
-                setTimeout(() => {
-                    drowBySymbol(symbolInfo.name,periodParams.from);
-                }, 1000);
-            }).catch(function(e){
-                loeading.close();
-                ElMessage.error({message: e, offset: (window.innerHeight / 2)});
-                onErrorCallback(e);
+            continuousKlines(symbolInfo.name,inervalData[resolution],(periodParams.from * 1000),(periodParams.to * 1000),1500,function(newData){
+                if(newData.length == 1500) {
+                    var t = newData[newData.length - 1].time;
+                    continuousKlines(symbolInfo.name,inervalData[resolution],
+                        newData[newData.length - 1].closeTime,(periodParams.to * 1000),1500,function(secData){
+                        for(var index = 0;index < secData.length;index++){
+                            if(secData[index].time == t){
+                                continue;
+                            }
+                            newData.push(secData[index]);
+                        }
+                        onHistoryCallback(newData,{ noData: newData.length == 0 });
+                        setTimeout(() => {
+                            drowBySymbol(symbolInfo.name,periodParams.from);
+                        }, 1000);
+                    });
+                } else {
+                    onHistoryCallback(newData,{ noData: newData.length == 0 });
+                    setTimeout(() => {
+                        drowBySymbol(symbolInfo.name,periodParams.from);
+                    }, 1000);
+                }
             });
+        } else {
+            onHistoryCallback([],{ noData: true });
         }
     },
     //实时行情订阅
@@ -324,6 +347,7 @@ export default {
             
         }).catch(function(e){
             console.log(e)
+            ElMessage.error({message: e, offset: (window.innerHeight / 2) - 50});
         })
         
         var socketClient = new WebSocket(baseWebSocketUrl + "/ws/" + symbolInfo.name.toLowerCase() + '_perpetual@continuousKline_' + inervalData[resolution].toLowerCase());
@@ -354,6 +378,7 @@ export default {
 
         socketClient.onerror = (error) => {
             console.error('WebSocket error:', error);
+            ElMessage.error({message: error, offset: (window.innerHeight / 2) - 50});
         };
     },
     //取消订阅
