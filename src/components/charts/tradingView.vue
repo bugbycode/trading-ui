@@ -59,6 +59,15 @@ const props = defineProps({
 	},
 	studiesOverrides: {
 		type: Object,
+		default: {
+			//"volume.volume.color.0": "#FF0000", // 下跌成交量颜色
+			//"volume.volume.color.1": "#1aff24", // 上涨成交量颜色
+			//"volume.volume.transparency": 0,   // 成交量透明度
+			//"volume.volume ma.color": "#0000FF", // 成交量均线颜色
+			//"volume.volume ma.transparency": 30, // 成交量均线透明度
+			"volume.show_as_panel": true,        // 将成交量显示在单独的面板
+			//"mainSeriesProperties.candleStyle.transparency": 0,
+		}
 	},
 	time_frames: {
 		type: Array,
@@ -115,6 +124,28 @@ onMounted(() => {
 
 		chartWidget.onChartReady(() => {
 			console.log('on chart ready.')
+			/*
+			chartWidget.chart().getSeries().setChartStyleProperties(1, {
+				
+				upColor: '#1aff24',
+				borderUpColor: '#1aff24',
+				wickUpColor: '#1aff24',
+				downColor: '#FF0000',
+				borderDownColor: '#FF0000',
+				wickDownColor: '#FF0000',
+				transparency: 0,
+			});*/
+
+			var chart = chartWidget.activeChart();
+			chart.getAllStudies().forEach(study => {
+				console.log(study.name)
+				if (study.name === 'Volume') {
+					chart.removeEntity(study.id);
+				}
+			});
+
+			chart.createStudy('Volume', false, true);
+
 			if(loading) {
 				loading.close();
 			}
