@@ -25,6 +25,8 @@ section
   gap: 2px;
   flex-wrap: wrap;
   overflow: hidden;
+  background-image: url('/public/static/images/login/login_background.png');
+  background-size:100% 100%;
 }
 section::before 
 {
@@ -32,8 +34,9 @@ section::before
   position: absolute;
   width: 100%;
   height: 100%;
-  background: linear-gradient(#000,#0f0,#000);
-  animation: animate 5s linear infinite;
+  /*background: linear-gradient(#000,#0f0,#000);*/
+  /*animation: animate 5s linear infinite;*/
+  opacity: 0;
 }
 @keyframes animate 
 {
@@ -55,11 +58,13 @@ section span
   background: #181818;
   z-index: 2;
   transition: 1.5s;
+  opacity: 0;
 }
 section span:hover 
 {
   background: #0f0;
   transition: 0s;
+  opacity: 0.2;
 }
 
 section .signin
