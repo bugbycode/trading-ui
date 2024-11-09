@@ -43,10 +43,34 @@
     <!--修改密码表单END-->
 
     <!--修改用户信息表单START-->
-    <el-dialog v-model="dialogSettingFormVisible" title="系统设置" width="500">
+    <el-dialog v-model="dialogSettingFormVisible" title="行情监控配置" width="500">
         <el-form :model="settingForm">
-            <el-form-item label="订阅AI分析" :label-width="settingLabelWidth" >
-                <el-radio-group v-model="settingForm.subscribeAi" size="small">
+            <el-form-item label="价格回撤分析" :label-width="settingLabelWidth" >
+                <el-radio-group v-model="settingForm.fibMonitor" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="行情波动分析" :label-width="settingLabelWidth" >
+                <el-radio-group v-model="settingForm.riseAndFallMonitor" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="开仓机会分析" :label-width="settingLabelWidth" >
+                <el-radio-group v-model="settingForm.emaMonitor" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="行情异动分析" :label-width="settingLabelWidth" >
+                <el-radio-group v-model="settingForm.emaRiseAndFall" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="高低点位分析" :label-width="settingLabelWidth" >
+                <el-radio-group v-model="settingForm.highOrLowMonitor" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
@@ -114,13 +138,18 @@
     //设置用户信息表单start ==================
 
     var dialogSettingFormVisible = ref(false);
-    const settingLabelWidth = '85px'
+    const settingLabelWidth = '125px'
     var settingForm = reactive({
-        subscribeAi: 0,
+        fibMonitor: 0,//是否订阅斐波那契回撤监控 0：否 1：是
+        riseAndFallMonitor: 0,//是否订阅涨跌幅监控 0：否 1：是
+        emaMonitor: 0,//是否订阅开仓机会监控 0：否 1：是
+        emaRiseAndFall: 0,//是否订阅行情异动监控 0：否 1：是
+        highOrLowMonitor: 0,//是否订阅标志性高低点监控 0：否 1：是
     });
 
     const changeSetting = () => {
-        axios.post('/user/changeSubscribeAi/' + settingForm.subscribeAi).then(function(result){
+        //console.log(JSON.stringify(settingForm));
+        axios.post('/user/changeSubscribeAi',settingForm).then(function(result){
             if(result.code == 1){
                 ElMessage.error({message: result.message, offset: (window.innerHeight / 2)});
             } else if(result.code == 0){
@@ -141,7 +170,11 @@
     const getUserInfo = () =>{
         axios.get('/user/userInfo').then(function(result){
             username.value = result.username;
-            settingForm.subscribeAi = result.subscribeAi;
+            settingForm.emaMonitor = result.emaMonitor;
+            settingForm.emaRiseAndFall = result.emaRiseAndFall;
+            settingForm.fibMonitor = result.fibMonitor;
+            settingForm.highOrLowMonitor = result.highOrLowMonitor;
+            settingForm.riseAndFallMonitor = result.riseAndFallMonitor;
         }).catch(function(err){
             
         })
