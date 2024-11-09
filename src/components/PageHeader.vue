@@ -125,6 +125,7 @@
                 ElMessage.error({message: result.message, offset: (window.innerHeight / 2)});
             } else if(result.code == 0){
                 ElMessage.success({message: result.message, offset: (window.innerHeight / 2)});
+                dialogSettingFormVisible.value = false;
             }
         }).catch(function(err){
             ElMessage.error({message: err, offset: (window.innerHeight / 2)});
