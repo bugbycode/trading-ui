@@ -385,7 +385,7 @@ export default {
 
         socketClient.onerror = (error) => {
             console.error('WebSocket error:', error);
-            ElMessage.error({message: error, offset: (window.innerHeight / 2) - 50});
+            //ElMessage.error({message: error, offset: (window.innerHeight / 2) - 50});
         };
     },
     //取消订阅
