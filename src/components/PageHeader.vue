@@ -96,6 +96,17 @@
     import axios from './../axios'
     var username = ref('')
     const router = useRouter()
+
+    const checkOnline = () => {
+        axios.get('/user/userInfo').then(function(result){
+            if(!(result && result.username)){
+                router.push('/login')
+            }
+        }).catch(function(e){
+            router.push('/login');
+        })
+    }
+
     //修改密码表单 start=======================
     const dialogFormVisible = ref(false);
     const formLabelWidth = '80px'
@@ -106,6 +117,7 @@
     })
 
     const changePwd = () => {
+        checkOnline();
         if(form.oldPwd == ''){
             ElMessage.error({message: '请输入旧密码', offset: (window.innerHeight / 2)});
         } else if(form.newPwd == ''){
@@ -148,6 +160,7 @@
     });
 
     const changeSetting = () => {
+        checkOnline();
         //console.log(JSON.stringify(settingForm));
         axios.post('/user/changeSubscribeAi',settingForm).then(function(result){
             if(result.code == 1){
