@@ -1,13 +1,18 @@
 <template>
     <el-row>
-        <el-col :span="12">
+        <el-col :span="8">
             <ul class="lineH-right headUl">
                 <el-text class="headerTitle">
                     <el-icon style="vertical-align: -5px;"><PieChart /></el-icon> 数字货币永续合约分析平台
                 </el-text>
             </ul>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="8">
+            <ul class="headUl">
+                <el-text class="headerTitle">当前Bot交易胜率：{{ botOrderPnl.winning }}，盈亏金额：{{ botOrderPnl.pnl }}</el-text>
+            </ul>
+        </el-col>
+        <el-col :span="8">
             <ul class="userIcon">
                 <el-text class="userInfo">
                     <el-icon class="handStyle usernameStyle" @click="dialogSettingFormVisible = true"><Setting /></el-icon>
@@ -94,6 +99,9 @@
 
     import {ref, onMounted ,reactive} from 'vue'
     import axios from './../axios'
+
+    const botOrderPnl = reactive({"winning":"50%","pnl":"100"})
+
     var username = ref('')
     const router = useRouter()
 
@@ -178,6 +186,7 @@
 
     onMounted(()=>{
         getUserInfo();
+        botPnl();
     })
 
     const getUserInfo = () =>{
@@ -216,6 +225,16 @@
     const maskEmail = (email) => {
       const [username, domain] = email.split('@');
       return `${username.slice(0, 3)}***@${domain}`;
+    }
+
+    const botPnl = () => {
+        axios.get('/bot/getOrderCount').then(function(data){
+            console.log(data)
+            botOrderPnl.winning = data.winning;
+            botOrderPnl.pnl = data.pnl;
+        }).catch(function(err){
+            console.error(err);
+        })
     }
 </script>
 <style scoped>
