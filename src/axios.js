@@ -17,7 +17,7 @@ instance.interceptors.request.use(
     const timestamp = new Date().getTime();
 
     const url = config.url;
-    if(url != '/user/userInfo'){
+    if(!(url == '/user/userInfo' || url == '/bot/getOrderCount')){
       loading = ElLoading.service({
         lock: true,
         text: 'Loading',

@@ -186,7 +186,9 @@
 
     onMounted(()=>{
         getUserInfo();
-        botPnl();
+        setInterval(() => {
+            botPnl();
+        }, 3000);
     })
 
     const getUserInfo = () =>{
