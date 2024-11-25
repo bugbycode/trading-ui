@@ -62,7 +62,7 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="价格行为分析" :label-width="settingLabelWidth" >
+            <el-form-item label="交易机会分析" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.emaMonitor" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
