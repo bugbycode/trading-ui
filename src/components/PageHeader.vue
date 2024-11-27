@@ -9,13 +9,15 @@
         </el-col>
         <el-col :span="8">
             <ul class="headUl">
-                <el-text class="headerTitle">当前Bot交易胜率：{{ botOrderPnl.winning }}，盈亏金额：{{ botOrderPnl.pnl }}</el-text>
+                <el-text class="headerTitle">当前Bot交易胜率：{{ botOrderPnl.winning }}，盈亏金额：{{ botOrderPnl.pnl }} USDT</el-text>
             </ul>
         </el-col>
         <el-col :span="8">
             <ul class="userIcon">
                 <el-text class="userInfo">
+                    <el-icon class="handStyle usernameStyle" @click="showBalance"><Wallet /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="dialogSettingFormVisible = true"><Setting /></el-icon>
+                    <el-icon class="handStyle usernameStyle" @click="dialogHmacFormVisible = true"><Key /></el-icon>
                     <el-icon><UserFilled /></el-icon>
                     <span class="handStyle usernameStyle" @click="dialogFormVisible = true">{{maskEmail(username)}}</span>
                     <el-icon class="handStyle" @click="logout"><Lock /></el-icon>
@@ -48,7 +50,7 @@
     <!--修改密码表单END-->
 
     <!--修改用户信息表单START-->
-    <el-dialog v-model="dialogSettingFormVisible" title="行情监控配置" width="500">
+    <el-dialog v-model="dialogSettingFormVisible" title="行情分析配置" width="500">
         <el-form :model="settingForm">
             <el-form-item label="价格回撤分析" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.fibMonitor" size="small">
@@ -92,6 +94,50 @@
     </el-dialog>
     <!--修改用户信息表单END-->
 
+    <!--修改Hmac Sha256信息表单 START -->
+    <el-dialog v-model="dialogHmacFormVisible" title="币安HMAC配置" width="500">
+        <el-form :model="settingForm">
+            <el-form-item label="API Key" :label-width="hmacFormLabelWidth" >
+                <el-input v-model="hmacForm.binanceApiKey" />
+            </el-form-item>
+            <el-form-item label="Secret Key" :label-width="hmacFormLabelWidth" >
+                <el-input v-model="hmacForm.binanceSecretKey" />
+            </el-form-item>
+            <el-form-item label="Auto Trade" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.autoTrade" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+        <div class="dialog-footer">
+            <el-button @click="dialogHmacFormVisible = false">取消</el-button>
+            <el-button type="primary" @click="changeApiSetting">
+                确定
+            </el-button>
+        </div>
+        </template>
+    </el-dialog>
+    <!--修改Hmac Sha256信息表单END-->
+
+    <!--余额信息 START -->
+    <el-dialog v-model="dialogWalletFormVisible" title="币安账户余额" width="500">
+        <el-form :model="walletData">
+            <el-form-item v-for="item in walletData" :label="item.asset" :label-width="hmacFormLabelWidth" >
+                {{ item.balance }}
+            </el-form-item>
+        </el-form>
+        <template #footer>
+        <div class="dialog-footer">
+            <el-button type="primary" @click="dialogWalletFormVisible = false">
+                确定
+            </el-button>
+        </div>
+        </template>
+    </el-dialog>
+    <!--余额信息END-->
+
 </template>
 <script setup>
     import { ElMessageBox, ElMessage } from 'element-plus'
@@ -114,6 +160,57 @@
             router.push('/login');
         })
     }
+
+    //查看余额逻辑 start ======================
+    const dialogWalletFormVisible = ref(false);
+    var walletData = [];
+    const showBalance = ()=>{
+        walletData = []
+        axios.get('/user/getBalance').then(function(result){
+            for(var index = 0;index < result.length;index++){
+                walletData.push(result[index]);
+            }
+            if(walletData.length == 0) {
+                dialogHmacFormVisible.value = true;
+            } else {
+                dialogWalletFormVisible.value = true;
+            }
+        }).catch(function(err){
+
+        })
+        
+    }
+
+    //查看余额逻辑 end ======================
+
+    //修改Hmac Sha256信息表单 start ===============
+
+    const dialogHmacFormVisible = ref(false);
+    const hmacFormLabelWidth = '100px';
+    var hmacForm = reactive({
+        binanceApiKey:'',
+        binanceSecretKey: '',
+        autoTrade : 0,
+    })
+
+    const changeApiSetting = ()=>{
+        checkOnline();
+        axios.post('/user/changeHmac',hmacForm).then(function(result){
+            if(result.code == 1){
+                ElMessage.error({message: result.message, offset: (window.innerHeight / 2)});
+            } else if(result.code == 0){
+                ElMessage.success({message: result.message, offset: (window.innerHeight / 2)});
+                dialogHmacFormVisible.value = false;
+                form.oldPwd = '';
+                form.newPwd = '';
+                form.confirmPwd = '';
+            }
+        }).catch(function(err){
+            ElMessage.error({message: err, offset: (window.innerHeight / 2)});
+        });
+    }
+
+    //修改Hmac Sha256信息表单 end ===============
 
     //修改密码表单 start=======================
     const dialogFormVisible = ref(false);
@@ -199,6 +296,9 @@
             settingForm.fibMonitor = result.fibMonitor;
             settingForm.highOrLowMonitor = result.highOrLowMonitor;
             settingForm.riseAndFallMonitor = result.riseAndFallMonitor;
+            hmacForm.autoTrade = result.autoTrade;
+            hmacForm.binanceApiKey = result.binanceApiKey;
+            hmacForm.binanceSecretKey = result.binanceSecretKey;
         }).catch(function(err){
             
         })
