@@ -118,6 +118,9 @@
             <el-form-item label="持仓价值" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.positionValue" :min="50" :max="1000" show-input />
             </el-form-item>
+            <el-form-item label="止损比例" :label-width="hmacFormLabelWidth" >
+                <el-slider v-model="hmacForm.cutLoss" :min="1" :max="10" show-input />
+            </el-form-item>
         </el-form>
         <template #footer>
         <div class="dialog-footer">
@@ -203,6 +206,7 @@
         baseStepSize: 1,
         leverage: 10,
         positionValue: 50,
+        cutLoss: 3,
     })
 
     const changeApiSetting = ()=>{
@@ -314,6 +318,7 @@
             hmacForm.baseStepSize = result.baseStepSize;
             hmacForm.leverage = result.leverage;
             hmacForm.positionValue = result.positionValue;
+            hmacForm.cutLoss = result.cutLoss;
         }).catch(function(err){
             
         })
