@@ -109,6 +109,15 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
+            <el-form-item label="名义价值" :label-width="hmacFormLabelWidth" >
+                <el-slider v-model="hmacForm.baseStepSize" :min="1" show-input />
+            </el-form-item>
+            <el-form-item label="杠杆倍数" :label-width="hmacFormLabelWidth" >
+                <el-slider v-model="hmacForm.leverage" :min="2" :max="10" show-input />
+            </el-form-item>
+            <el-form-item label="持仓价值" :label-width="hmacFormLabelWidth" >
+                <el-slider v-model="hmacForm.positionValue" :min="50" :max="1000" show-input />
+            </el-form-item>
         </el-form>
         <template #footer>
         <div class="dialog-footer">
@@ -191,6 +200,9 @@
         binanceApiKey:'',
         binanceSecretKey: '',
         autoTrade : 0,
+        baseStepSize: 1,
+        leverage: 10,
+        positionValue: 50,
     })
 
     const changeApiSetting = ()=>{
@@ -299,6 +311,9 @@
             hmacForm.autoTrade = result.autoTrade;
             hmacForm.binanceApiKey = result.binanceApiKey;
             hmacForm.binanceSecretKey = result.binanceSecretKey;
+            hmacForm.baseStepSize = result.baseStepSize;
+            hmacForm.leverage = result.leverage;
+            hmacForm.positionValue = result.positionValue;
         }).catch(function(err){
             
         })
