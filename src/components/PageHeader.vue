@@ -121,6 +121,9 @@
             <el-form-item label="止损比例" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.cutLoss" :min="1" :max="10" show-input />
             </el-form-item>
+            <el-form-item label="获利预期" :label-width="hmacFormLabelWidth" >
+                <el-slider v-model="hmacForm.profit" :min="3" :max="10" show-input />
+            </el-form-item>
         </el-form>
         <template #footer>
         <div class="dialog-footer">
@@ -207,6 +210,7 @@
         leverage: 10,
         positionValue: 50,
         cutLoss: 3,
+        profit: 3,
     })
 
     const changeApiSetting = ()=>{
@@ -319,6 +323,7 @@
             hmacForm.leverage = result.leverage;
             hmacForm.positionValue = result.positionValue;
             hmacForm.cutLoss = result.cutLoss;
+            hmacForm.profit = result.profit;
         }).catch(function(err){
             
         })
