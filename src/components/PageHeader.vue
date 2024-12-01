@@ -97,20 +97,26 @@
     <!--修改Hmac Sha256信息表单 START -->
     <el-dialog v-model="dialogHmacFormVisible" title="币安HMAC配置" width="500">
         <el-form :model="settingForm">
-            <el-form-item label="API Key" :label-width="hmacFormLabelWidth" >
+            <el-form-item label="公钥信息" :label-width="hmacFormLabelWidth" >
                 <el-input v-model="hmacForm.binanceApiKey" />
             </el-form-item>
-            <el-form-item label="Secret Key" :label-width="hmacFormLabelWidth" >
+            <el-form-item label="私钥信息" :label-width="hmacFormLabelWidth" >
                 <el-input v-model="hmacForm.binanceSecretKey" />
             </el-form-item>
-            <el-form-item label="Auto Trade" :label-width="hmacFormLabelWidth" >
+            <el-form-item label="自动交易" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.autoTrade" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
+            <el-form-item label="交易指标" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.autoTradeType" size="small">
+                    <el-radio-button label="价格行为" :value="1" />
+                    <el-radio-button label="斐波那契" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
             <el-form-item label="名义价值" :label-width="hmacFormLabelWidth" >
-                <el-slider v-model="hmacForm.baseStepSize" :min="1" show-input />
+                <el-slider v-model="hmacForm.baseStepSize" :min="1" :max="100" show-input />
             </el-form-item>
             <el-form-item label="杠杆倍数" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.leverage" :min="2" :max="10" show-input />
@@ -122,7 +128,7 @@
                 <el-slider v-model="hmacForm.cutLoss" :min="1" :max="10" show-input />
             </el-form-item>
             <el-form-item label="获利预期" :label-width="hmacFormLabelWidth" >
-                <el-slider v-model="hmacForm.profit" :min="3" :max="10" show-input />
+                <el-slider v-model="hmacForm.profit" :min="1" :max="10" show-input />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -206,6 +212,7 @@
         binanceApiKey:'',
         binanceSecretKey: '',
         autoTrade : 0,
+        autoTradeType: 1,
         baseStepSize: 1,
         leverage: 10,
         positionValue: 50,
@@ -317,6 +324,7 @@
             settingForm.highOrLowMonitor = result.highOrLowMonitor;
             settingForm.riseAndFallMonitor = result.riseAndFallMonitor;
             hmacForm.autoTrade = result.autoTrade;
+            hmacForm.autoTradeType = result.autoTradeType;
             hmacForm.binanceApiKey = result.binanceApiKey;
             hmacForm.binanceSecretKey = result.binanceSecretKey;
             hmacForm.baseStepSize = result.baseStepSize;
