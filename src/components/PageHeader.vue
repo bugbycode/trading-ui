@@ -128,7 +128,7 @@
                 <el-slider v-model="hmacForm.cutLoss" :min="1" :max="10" show-input />
             </el-form-item>
             <el-form-item label="获利预期" :label-width="hmacFormLabelWidth" >
-                <el-slider v-model="hmacForm.profit" :min="1" :max="10" show-input />
+                <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.6" :max="10" show-input />
             </el-form-item>
         </el-form>
         <template #footer>
