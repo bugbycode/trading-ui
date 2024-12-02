@@ -17,7 +17,7 @@
                 <el-text class="userInfo">
                     <el-icon class="handStyle usernameStyle" @click="showBalance"><Wallet /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="dialogSettingFormVisible = true"><Setting /></el-icon>
-                    <el-icon class="handStyle usernameStyle" @click="dialogHmacFormVisible = true"><Key /></el-icon>
+                    <el-icon class="handStyle usernameStyle" @click="showHmacForm"><Key /></el-icon>
                     <el-icon><UserFilled /></el-icon>
                     <span class="handStyle usernameStyle" @click="dialogFormVisible = true">{{maskEmail(username)}}</span>
                     <el-icon class="handStyle" @click="logout"><Lock /></el-icon>
@@ -101,7 +101,7 @@
                 <el-input v-model="hmacForm.binanceApiKey" />
             </el-form-item>
             <el-form-item label="私钥信息" :label-width="hmacFormLabelWidth" >
-                <el-input v-model="hmacForm.binanceSecretKey" />
+                <el-input v-model="hmacForm.binanceSecretKey" show-password clearable/>
             </el-form-item>
             <el-form-item label="自动交易" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.autoTrade" size="small">
@@ -130,6 +130,9 @@
             </el-form-item>
             <el-form-item label="获利预期" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.6" :max="10" show-input />
+            </el-form-item>
+            <el-form-item label="密码验证" :label-width="hmacFormLabelWidth" >
+                <el-input v-model="hmacForm.password" show-password clearable/>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -219,6 +222,7 @@
         positionValue: 50,
         cutLoss: 3,
         profit: 3,
+        password: '',
     })
 
     const changeApiSetting = ()=>{
@@ -236,6 +240,12 @@
         }).catch(function(err){
             ElMessage.error({message: err, offset: (window.innerHeight / 2)});
         });
+    }
+
+    const showHmacForm = ()=>{
+        dialogHmacFormVisible.value = true;
+        hmacForm.password = '';
+        getUserInfo();
     }
 
     //修改Hmac Sha256信息表单 end ===============
