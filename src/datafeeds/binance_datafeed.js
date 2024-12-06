@@ -59,6 +59,8 @@ shapeType.set('LineToolFixedRangeVolumeProfile','fixed_range_volume_profile')//�
 
 var widget = null;
 var shapeMap = new Map();
+var change_remove_status_func;
+
 //画图
 const drowBySymbol = (symbol,time) => {
     var shapeArr = shapeMap.get(symbol);
@@ -67,7 +69,7 @@ const drowBySymbol = (symbol,time) => {
 			var shapeInfo = shapeArr[index];
 			var shape_type = shapeType.get(shapeInfo.shape);
 			if(shape_type){
-				if(shapeInfo.draw_status == 0 && time <= shapeInfo.points[0].time && widget){
+				if(/*shapeInfo.draw_status == 0 && */time <= shapeInfo.points[0].time && widget){
 					var entityId = widget.activeChart().createMultipointShape(
 						shapeInfo.points,
 						{
@@ -75,6 +77,14 @@ const drowBySymbol = (symbol,time) => {
 							overrides: shapeInfo.properties,
 						}
 					);
+
+                    if(shapeInfo.draw_id) {
+                        change_remove_status_func(false);
+                        widget.activeChart().removeEntity(shapeInfo.draw_id);
+                        change_remove_status_func(true);
+                        shapeInfo.draw_id = null;
+                    }
+
 					if(entityId){
 						shapeInfo.draw_status = 1;
 						shapeInfo.draw_id = entityId
@@ -121,7 +131,10 @@ const continuousKlines = (pair,interval,startTime,endTime,limit,call) => {
 }
 
 export default {
-
+    //初始化回调函数
+    init_change_remove_status_func(call) {
+        change_remove_status_func = call;
+    },
     //获取服务端配置的交易对
     initPairsInfo: async(call) => {
         
