@@ -109,20 +109,6 @@
             <el-form-item label="私钥信息" :label-width="hmacFormLabelWidth" >
                 <el-input v-model="hmacForm.binanceSecretKey" show-password clearable/>
             </el-form-item>
-            <el-form-item label="自动交易" :label-width="hmacFormLabelWidth" >
-                <el-radio-group v-model="hmacForm.autoTrade" size="small">
-                    <el-radio-button label="开启" :value="1" />
-                    <el-radio-button label="关闭" :value="0"/>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item label="交易指标" :label-width="hmacFormLabelWidth" >
-                <el-radio-group v-model="hmacForm.autoTradeType" size="small">
-                    <el-radio-button label="盘整区间" :value="3" />
-                    <el-radio-button label="指数均线" :value="2" />
-                    <el-radio-button label="价格行为" :value="1" />
-                    <el-radio-button label="斐波那契" :value="0"/>
-                </el-radio-group>
-            </el-form-item>
             <el-form-item label="名义价值" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.baseStepSize" :min="1" :max="100" show-input />
             </el-form-item>
@@ -137,6 +123,26 @@
             </el-form-item>
             <el-form-item label="获利预期" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.6" :max="10" show-input />
+            </el-form-item>
+            <el-form-item label="交易指标" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.autoTradeType" size="small">
+                    <el-radio-button label="盘整区间" :value="3" />
+                    <el-radio-button label="指数均线" :value="2" />
+                    <el-radio-button label="价格行为" :value="1" />
+                    <el-radio-button label="斐波那契" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="自动交易" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.autoTrade" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="画线交易" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.drawTrade" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
             </el-form-item>
             <el-form-item label="密码验证" :label-width="hmacFormLabelWidth" >
                 <el-input v-model="hmacForm.password" show-password clearable/>
@@ -224,6 +230,7 @@
         binanceSecretKey: '',
         autoTrade : 0,
         autoTradeType: 1,
+        drawTrade: 0,
         baseStepSize: 1,
         leverage: 10,
         positionValue: 50,
@@ -352,6 +359,7 @@
             hmacForm.positionValue = result.positionValue;
             hmacForm.cutLoss = result.cutLoss;
             hmacForm.profit = result.profit;
+            hmacForm.drawTrade = result.drawTrade;
         }).catch(function(err){
             
         })
