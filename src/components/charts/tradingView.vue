@@ -8,12 +8,10 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-var start_draw = false;
-var remove_draw = true;
+var start_draw = true;
 
-Datafeed.init_change_remove_status_func(function(status){
-	remove_draw = status;
-	start_draw = false;
+Datafeed.init_change_remove_status_func(function(edit_status){
+	start_draw = edit_status;
 })
 
 function getLanguageFromURL() {
@@ -160,7 +158,6 @@ onMounted(() => {
 			Datafeed.initChartWidget(chartWidget);
 			//在图表添加绘图时触发的事件
 			chartWidget.subscribe('drawing', (event) => {
-				start_draw = true;
 				//console.log(`drawing type as :${event.value}`);
 			});
 			//创建、修改、删除绘图时触发的事件
@@ -174,15 +171,11 @@ onMounted(() => {
 				})
 				//console.log(`id:${id}, type:${type}`);
 
-				if(type == 'click') {
-					start_draw = true;
-				}
-
 				if(type == 'create'){
 					Datafeed.saveShapeInfo(id);
-				} else if(type == 'remove' && remove_draw){
+				} else if(type == 'remove' && start_draw){
 					Datafeed.removeShapeInfo(id);
-				} else if(type == 'properties_changed' || type == 'points_changed' 
+				} else if((type == 'properties_changed' || type == 'points_changed') 
 					&& start_draw){
 					Datafeed.changeShapeInfo(id);
 				}
