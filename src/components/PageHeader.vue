@@ -392,7 +392,7 @@
 
     const botPnl = () => {
         axios.get('/bot/getOrderCount').then(function(data){
-            console.log(data)
+            //console.log(data)
             botOrderPnl.winning = data.winning;
             botOrderPnl.pnl = data.pnl;
         }).catch(function(err){
