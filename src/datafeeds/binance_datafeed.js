@@ -63,6 +63,7 @@ var change_remove_status_func;
 
 //画图
 const drowBySymbol = (symbol,time) => {
+    change_remove_status_func(false);
     var shapeArr = shapeMap.get(symbol);
 	if(shapeArr){
 		for(var index = 0;index < shapeArr.length;index++){
@@ -79,9 +80,7 @@ const drowBySymbol = (symbol,time) => {
 					);
 
                     if(shapeInfo.draw_id) {
-                        change_remove_status_func(false);
                         widget.activeChart().removeEntity(shapeInfo.draw_id);
-                        change_remove_status_func(true);
                         shapeInfo.draw_id = null;
                     }
 
@@ -93,6 +92,7 @@ const drowBySymbol = (symbol,time) => {
 			}
 		}
 	}
+    change_remove_status_func(true);
 }
 
 const continuousKlines = (pair,interval,startTime,endTime,limit,call) => {

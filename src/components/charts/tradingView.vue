@@ -13,6 +13,7 @@ var remove_draw = true;
 
 Datafeed.init_change_remove_status_func(function(status){
 	remove_draw = status;
+	start_draw = false;
 })
 
 function getLanguageFromURL() {
