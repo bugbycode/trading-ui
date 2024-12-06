@@ -134,7 +134,7 @@ onMounted(() => {
 		chartWidget = new widget(widgetOptions);
 
 		chartWidget.onChartReady(() => {
-			console.log('on chart ready.')
+			//console.log('on chart ready.')
 			/*
 			chartWidget.chart().getSeries().setChartStyleProperties(1, {
 				
@@ -164,17 +164,17 @@ onMounted(() => {
 
 			//在图表添加绘图时触发的事件
 			chartWidget.subscribe('drawing', (event) => {
-				console.log(`drawing type as :${event.value}`);
+				//console.log(`drawing type as :${event.value}`);
 			});
 
 			//变更交易对
 			chart.onSymbolChanged().subscribe(null, () => {
-				console.log('The symbol is changed');
+				//console.log('The symbol is changed');
 				start_draw = false;
 			});
 			//变更时间级别
 			chart.onIntervalChanged().subscribe(null, (interval, timeframeObj) =>{
-				console.log('The Interval is changed');
+				//console.log('The Interval is changed');
 				start_draw = false;
 			})
 
@@ -187,7 +187,7 @@ onMounted(() => {
 				}).catch(function(e){
 					router.push('/login');
 				})
-				console.log(`id:${id}, type:${type}`);
+				//console.log(`id:${id}, type:${type}`);
 
 				if(type == 'click') {
 					start_draw = true;
