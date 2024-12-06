@@ -8,11 +8,16 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-var start_draw = true;
+var start_draw = false;
+var remove_draw = false;
 
-Datafeed.init_change_remove_status_func(function(edit_status){
-	start_draw = edit_status;
+Datafeed.init_change_remove_status_func(function(status){
+	remove_draw = status;
 })
+
+Datafeed.init_start_draw_status_func(function(status){
+	start_draw = status;
+});
 
 function getLanguageFromURL() {
 	const regex = new RegExp('[\\?&]lang=([^&#]*)');
@@ -156,10 +161,23 @@ onMounted(() => {
 				loading.close();
 			}
 			Datafeed.initChartWidget(chartWidget);
+
 			//在图表添加绘图时触发的事件
 			chartWidget.subscribe('drawing', (event) => {
-				//console.log(`drawing type as :${event.value}`);
+				console.log(`drawing type as :${event.value}`);
 			});
+
+			//变更交易对
+			chart.onSymbolChanged().subscribe(null, () => {
+				console.log('The symbol is changed');
+				start_draw = false;
+			});
+			//变更时间级别
+			chart.onIntervalChanged().subscribe(null, (interval, timeframeObj) =>{
+				console.log('The Interval is changed');
+				start_draw = false;
+			})
+
 			//创建、修改、删除绘图时触发的事件
 			chartWidget.subscribe('drawing_event', (id, type) => {
 				axios.get('/user/userInfo').then(function(result){
@@ -169,14 +187,18 @@ onMounted(() => {
 				}).catch(function(e){
 					router.push('/login');
 				})
-				//console.log(`id:${id}, type:${type}`);
+				console.log(`id:${id}, type:${type}`);
+
+				if(type == 'click') {
+					start_draw = true;
+				}
 
 				if(type == 'create'){
 					Datafeed.saveShapeInfo(id);
-				} else if(type == 'remove' && start_draw){
+				} else if(type == 'remove' && remove_draw == true){
 					Datafeed.removeShapeInfo(id);
 				} else if((type == 'properties_changed' || type == 'points_changed') 
-					&& start_draw){
+					&& start_draw == true){
 					Datafeed.changeShapeInfo(id);
 				}
 			});

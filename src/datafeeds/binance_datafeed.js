@@ -60,17 +60,19 @@ shapeType.set('LineToolFixedRangeVolumeProfile','fixed_range_volume_profile')//�
 var widget = null;
 var shapeMap = new Map();
 var change_remove_status_func;
+var start_draw_status_func;
 
 //画图
 const drowBySymbol = (symbol,time) => {
     change_remove_status_func(false);
+    start_draw_status_func(false);
     var shapeArr = shapeMap.get(symbol);
 	if(shapeArr){
 		for(var index = 0;index < shapeArr.length;index++){
 			var shapeInfo = shapeArr[index];
 			var shape_type = shapeType.get(shapeInfo.shape);
 			if(shape_type){
-				if(/*shapeInfo.draw_status == 0 && */time <= shapeInfo.points[0].time && widget){
+				if(/*shapeInfo.draw_status == 0 &&*/ time <= shapeInfo.points[0].time && widget){
 					var entityId = widget.activeChart().createMultipointShape(
 						shapeInfo.points,
 						{
@@ -78,7 +80,7 @@ const drowBySymbol = (symbol,time) => {
 							overrides: shapeInfo.properties,
 						}
 					);
-
+                    
                     if(shapeInfo.draw_id) {
                         widget.activeChart().removeEntity(shapeInfo.draw_id);
                         shapeInfo.draw_id = null;
@@ -93,6 +95,7 @@ const drowBySymbol = (symbol,time) => {
 		}
 	}
     change_remove_status_func(true);
+    start_draw_status_func(true);
 }
 
 const continuousKlines = (pair,interval,startTime,endTime,limit,call) => {
@@ -131,6 +134,10 @@ const continuousKlines = (pair,interval,startTime,endTime,limit,call) => {
 }
 
 export default {
+    //初始化回调函数
+    init_start_draw_status_func(call){
+        start_draw_status_func = call;
+    },
     //初始化回调函数
     init_change_remove_status_func(call) {
         change_remove_status_func = call;
@@ -359,7 +366,6 @@ export default {
     //实时行情订阅
     subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) => {
         console.log('[subscribeBars]: Method call with subscriberUID:', subscriberUID);
-        
         axios.post('/tradingview/save',{
             inerval: resolution,
             symbol: symbolInfo.name,

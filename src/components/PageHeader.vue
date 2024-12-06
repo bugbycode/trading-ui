@@ -8,9 +8,9 @@
             </ul>
         </el-col>
         <el-col :span="8">
-            <ul class="headUl">
+            <!--<ul class="headUl">
                 <el-text class="headerTitle">当前Bot交易胜率：{{ botOrderPnl.winning }}，盈亏金额：{{ botOrderPnl.pnl }} USDT</el-text>
-            </ul>
+            </ul>-->
         </el-col>
         <el-col :span="8">
             <ul class="userIcon">
@@ -336,9 +336,9 @@
 
     onMounted(()=>{
         getUserInfo();
-        setInterval(() => {
+        /*setInterval(() => {
             botPnl();
-        }, 3000);
+        }, 3000);*/
     })
 
     const getUserInfo = () =>{
