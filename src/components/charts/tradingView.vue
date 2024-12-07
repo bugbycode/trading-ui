@@ -1,14 +1,72 @@
 <script setup>
-import { onMounted, ref, onUnmounted } from 'vue';
+import { onMounted, ref, onUnmounted,reactive } from 'vue';
 import { widget } from './../../../public/charting_library';
 import Datafeed from './../../datafeeds/binance_datafeed.js';
 import axios from './../../axios';
-import { ElLoading } from 'element-plus'
+import { ElLoading, ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 
 const router = useRouter();
 
 var subscribe_status = false;
+//取消订阅
+const unsubscribe_event = (time) => {
+	subscribe_status = false;
+}
+
+//订阅事件
+const subscribe_event = (time) => {
+	subscribe_status = true;
+}
+
+//修改水平射线持仓方向表单逻辑 START
+const horizontal_ray_form_visible = ref(false);
+const horizontal_ray_form_label_with = '100px';
+const horizontal_ray_form = reactive({
+	id: '',
+	longOrShortType: 0,//做多或做空 水平射线使用 0：空 1：多
+	shapeId: '',
+})
+
+const show_horizontal_ray_form = (id,longOrShortType,shapeId) => {
+	horizontal_ray_form.id = id;
+	horizontal_ray_form.longOrShortType = longOrShortType;
+	horizontal_ray_form.shapeId = shapeId;
+	horizontal_ray_form_visible.value = true;
+}
+
+Datafeed.init_show_horizontal_ray_form_func(show_horizontal_ray_form);
+
+const save_horizontal_ray_form = () => {
+	axios.post('/shape/updateLongOrShortType',{
+		id: horizontal_ray_form.id,
+		longOrShortType: horizontal_ray_form.longOrShortType
+	}).then(function(result){
+		if(result.code == 1){
+            ElMessage.error({message: result.message, offset: (window.innerHeight / 2)});
+		} else if(result.code == 0){
+			//图纸实例
+			var iLineDataSourceApi = Datafeed.getWidget().activeChart().getShapeById(horizontal_ray_form.shapeId);
+			var linecolor_pro;
+			if(horizontal_ray_form.longOrShortType == 1) {
+				linecolor_pro = { linecolor : "rgb(0, 128, 0)" };
+			} else {
+				linecolor_pro = { linecolor : "rgb(255, 0, 0)" };
+			}
+
+			iLineDataSourceApi.setProperties(linecolor_pro,true);
+
+			ElMessage.success({message: result.message, offset: (window.innerHeight / 2)});
+			horizontal_ray_form_visible.value = false;
+		}
+	}).catch(function(err){
+		console.error(err);
+		ElMessage.error({message: err, offset: (window.innerHeight / 2) - 50});
+		subscribe_event();
+	})
+}
+
+//修改水平射线持仓方向表单逻辑 END
 
 //订阅绘图事件回调函数
 var subscribe_drawing_func_call = (event) => {
@@ -35,28 +93,8 @@ var subscribe_drawing_event_func_call = (id, type) => {
 	}
 }
 
-var last_bar_end_time = 0;
-
-//取消订阅
-const unsubscribe_event = (time) => {
-	subscribe_status = false;
-}
-
-//订阅事件
-const subscribe_event = (time) => {
-	subscribe_status = true;
-	last_bar_end_time = time;
-}
 
 Datafeed.init_subscribe_event_func(subscribe_event,unsubscribe_event);
-
-function getLanguageFromURL() {
-	const regex = new RegExp('[\\?&]lang=([^&#]*)');
-	const results = regex.exec(window.location.search);
-	return results === null
-		? null
-		: decodeURIComponent(results[1].replace(/\+/g, ' '));
-}
 
 const props = defineProps({
 	symbol: {
@@ -235,6 +273,26 @@ onUnmounted(() => {
 
 <template>
 	<div class="TVChartContainer" ref="chartContainer" />
+	<!--修改水平射线持仓方向表单 START-->
+	<el-dialog v-model="horizontal_ray_form_visible" title="选择持仓方向" width="300">
+		<el-form :model="horizontal_ray_form">
+			<el-form-item label="持仓方向" :label-width="horizontal_ray_form_label_with">
+				<el-radio-group v-model="horizontal_ray_form.longOrShortType" size="small">
+                    <el-radio-button label="开多" :value="1" />
+                    <el-radio-button label="开空" :value="0"/>
+                </el-radio-group>
+			</el-form-item>
+		</el-form>
+		<template #footer>
+			<div class="dialog-footer">
+				<!--<el-button @click="horizontal_ray_form_visible = false">关闭</el-button>-->
+				<el-button type="primary" @click="save_horizontal_ray_form">
+				确认
+				</el-button>
+			</div>
+		</template>
+	</el-dialog>
+	<!--修改水平射线持仓方向表单 END-->
 </template>
 
 <style scoped>

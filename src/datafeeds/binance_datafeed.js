@@ -9,6 +9,9 @@ const baseWebSocketUrl = 'wss://fstream.binance.com';
 var subscribe_event;
 var unsubscribe_event;
 
+//显示修改水平射线持仓方向表单
+var show_horizontal_ray_form_func;
+
 //当前已订阅的交易对
 var clientMap = new Map();
 //交易所、交易对、时间级别等配置信息
@@ -136,6 +139,12 @@ const continuousKlines = (pair,interval,startTime,endTime,limit,call) => {
 }
 
 export default {
+    getWidget: ()=>{
+        return widget;
+    },
+    init_show_horizontal_ray_form_func: (func) => {
+        show_horizontal_ray_form_func = func;
+    },
     saveConfig: (symbol,interval) => {
         axios.post('/tradingview/save',{
             inerval: interval,
@@ -236,7 +245,19 @@ export default {
                     shapeArray = [];
                     shapeMap.set(jsonData.symbol,shapeArray);
                 }
+                jsonData.longOrShortType = result.longOrShortType;
                 shapeArray.push(jsonData);
+                //水平射线可以修改持仓方向
+                if(jsonData.shape == 'LineToolHorzRay'){
+                    show_horizontal_ray_form_func(result.id,result.longOrShortType,jsonData.draw_id);
+                    var linecolor_pro;
+                    if(result.longOrShortType == 1) {
+                        linecolor_pro = { linecolor : "rgb(0, 128, 0)" };
+                    } else {
+                        linecolor_pro = { linecolor : "rgb(255, 0, 0)" };
+                    }
+                    iLineDataSourceApi.setProperties(linecolor_pro,true);
+                }
             }).catch(function(e){
                 console.error(e);
             });
@@ -280,7 +301,18 @@ export default {
                     shapeInfo.properties = JSON.stringify(properties);
                     shapeInfo.points = JSON.stringify(points);
                     axios.post('/shape/updateShapeInfo',shapeInfo).then(function(result){
-                        
+                        //水平射线可修改持仓方向
+                        //if(shapeInfo.shape == 'LineToolHorzRay') {
+                            //show_horizontal_ray_form_func(shapeInfo._id,result.longOrShortType,shapeInfo.draw_id);
+                            /*var linecolor_pro;
+                            if(result.longOrShortType == 1) {
+                                linecolor_pro = { linecolor : "rgb(0, 128, 0)" };
+                            } else {
+                                linecolor_pro = { linecolor : "rgb(255, 0, 0)" };
+                            }
+                            iLineDataSourceApi.setProperties(linecolor_pro,false);*/
+                            //properties.linecolor = 'rgb(255, 0, 0)';
+                        //}
                     }).catch(function(e){
                         console.error(e);
                         ElMessage.error({message: e, offset: (window.innerHeight / 2) - 50});
