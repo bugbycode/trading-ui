@@ -73,7 +73,7 @@ const drowBySymbol = (symbol,time) => {
             var shapeInfo = shapeArr[index];
             var shape_type = shapeType.get(shapeInfo.shape);
             if(shape_type){
-                if(/*shapeInfo.draw_status == 0 &&*/ time <= shapeInfo.points[0].time && widget){
+                if(shapeInfo.draw_status == 1 && time <= shapeInfo.points[0].time && widget){
                     if(shapeInfo.draw_id) {
                         widget.activeChart().removeEntity(shapeInfo.draw_id);
                         shapeInfo.draw_id = null;
@@ -88,7 +88,6 @@ const drowBySymbol = (symbol,time) => {
                     );
 
                     if(entityId){
-                        shapeInfo.draw_status = 1;
                         shapeInfo.draw_id = entityId
                     }
                 }
@@ -194,7 +193,7 @@ export default {
                         shape: shapeInfo.shape,
                         points: JSON.parse(shapeInfo.points),
                         properties: JSON.parse(shapeInfo.properties),
-                        draw_status: 0,//是否已在界面绘图 0：未绘图 1：已绘图
+                        draw_status: 1,//是否可绘图 0：否 1：是
                     })
                 }
             };
@@ -252,7 +251,12 @@ export default {
             for(var index = 0;index < shapeArray.length;index++){
                 var shapeInfo = shapeArray[index];
                 if(shapeInfo.draw_id == id){
-                    axios.post('/shape/deleteShapeInfo/'+ shapeInfo._id);
+                    shapeInfo.draw_status = 0;//标记删除
+                    axios.post('/shape/deleteShapeInfo/'+ shapeInfo._id).then(function(result) {
+                        
+                    }).catch(function(err){
+                        console.error(err)
+                    });
                 }
             }
         }
