@@ -6,18 +6,49 @@ import axios from './../../axios';
 import { ElLoading } from 'element-plus'
 import { useRouter } from 'vue-router'
 
-const router = useRouter()
+const router = useRouter();
 
-var start_draw = false;
-var remove_draw = false;
+var subscribe_status = false;
 
-Datafeed.init_change_remove_status_func(function(status){
-	remove_draw = status;
-})
+//订阅绘图事件回调函数
+var subscribe_drawing_func_call = (event) => {
+	//console.log(subscribe_status);
+	//console.log(`drawing type as :${event.value}`);
+}
+var subscribe_drawing_event_func_call = (id, type) => {
+	//console.log(subscribe_status);
+	axios.get('/user/userInfo').then(function(result){
+		if(!(result && result.username)){
+			router.push('/login')
+		}
+	}).catch(function(e){
+		router.push('/login');
+	})
+	//console.log(`id:${id}, type:${type}`);
 
-Datafeed.init_start_draw_status_func(function(status){
-	start_draw = status;
-});
+	if(type == 'create' && subscribe_status){
+		Datafeed.saveShapeInfo(id);
+	} else if(type == 'remove' && subscribe_status){
+		Datafeed.removeShapeInfo(id);
+	} else if((type == 'properties_changed' || type == 'points_changed') && subscribe_status){
+		Datafeed.changeShapeInfo(id);
+	}
+}
+
+var last_bar_end_time = 0;
+
+//取消订阅
+const unsubscribe_event = (time) => {
+	subscribe_status = false;
+}
+
+//订阅事件
+const subscribe_event = (time) => {
+	subscribe_status = true;
+	last_bar_end_time = time;
+}
+
+Datafeed.init_subscribe_event_func(subscribe_event,unsubscribe_event);
 
 function getLanguageFromURL() {
 	const regex = new RegExp('[\\?&]lang=([^&#]*)');
@@ -119,10 +150,12 @@ onMounted(() => {
 	};
 
 	Datafeed.initPairsInfo(function(cfg){
+		var global_symbol = cfg.symbol;
+		var global_interval = cfg.inerval;
 		//console.log(cfg);
 		if(cfg){
-			widgetOptions.symbol = cfg.symbol;
-			widgetOptions.interval = cfg.inerval;
+			widgetOptions.symbol = global_symbol;
+			widgetOptions.interval = global_interval;
 		}
 
 		var loading = ElLoading.service({
@@ -149,7 +182,7 @@ onMounted(() => {
 
 			var chart = chartWidget.activeChart();
 			chart.getAllStudies().forEach(study => {
-				console.log(study.name)
+				//console.log(study.name)
 				if (study.name === 'Volume') {
 					chart.removeEntity(study.id);
 				}
@@ -160,48 +193,33 @@ onMounted(() => {
 			if(loading) {
 				loading.close();
 			}
+			//console.log(chartWidget)
 			Datafeed.initChartWidget(chartWidget);
 
 			//在图表添加绘图时触发的事件
-			chartWidget.subscribe('drawing', (event) => {
-				//console.log(`drawing type as :${event.value}`);
-			});
+			chartWidget.subscribe('drawing', subscribe_drawing_func_call);
+
+			//创建、修改、删除绘图时触发的事件
+			chartWidget.subscribe('drawing_event', subscribe_drawing_event_func_call);
 
 			//变更交易对
 			chart.onSymbolChanged().subscribe(null, () => {
 				//console.log('The symbol is changed');
-				start_draw = false;
+				subscribe_status = false;
+				//console.log(chart.interval());
+				global_symbol = chart.symbol();
+				Datafeed.saveConfig(global_symbol,global_interval);
 			});
 			//变更时间级别
 			chart.onIntervalChanged().subscribe(null, (interval, timeframeObj) =>{
 				//console.log('The Interval is changed');
-				start_draw = false;
+				//console.log(chart.symbol());
+				// 获取当前时间级别
+				//console.log(Datafeed.inervalData()[interval]);
+				subscribe_status = false;
+				global_interval = interval;
+				Datafeed.saveConfig(global_symbol,global_interval);
 			})
-
-			//创建、修改、删除绘图时触发的事件
-			chartWidget.subscribe('drawing_event', (id, type) => {
-				axios.get('/user/userInfo').then(function(result){
-					if(!(result && result.username)){
-						router.push('/login')
-					}
-				}).catch(function(e){
-					router.push('/login');
-				})
-				//console.log(`id:${id}, type:${type}`);
-
-				if(type == 'click') {
-					start_draw = true;
-				}
-
-				if(type == 'create'){
-					Datafeed.saveShapeInfo(id);
-				} else if(type == 'remove' && remove_draw == true){
-					Datafeed.removeShapeInfo(id);
-				} else if((type == 'properties_changed' || type == 'points_changed') 
-					&& start_draw == true){
-					Datafeed.changeShapeInfo(id);
-				}
-			});
 		});
 	});
 

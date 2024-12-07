@@ -1,10 +1,14 @@
 import axios_ from 'axios';
 import axios from './../axios'
-import { generateSymbol, parseFullSymbol } from './helpers.js';
 import { ElMessage,ElLoading } from 'element-plus'
 //binance klines http url https://fapi.binance.com
 const baseHttpUrl = 'https://fapi.binance.com';
 const baseWebSocketUrl = 'wss://fstream.binance.com';
+
+//订阅函数
+var subscribe_event;
+var unsubscribe_event;
+
 //当前已订阅的交易对
 var clientMap = new Map();
 //交易所、交易对、时间级别等配置信息
@@ -59,43 +63,42 @@ shapeType.set('LineToolFixedRangeVolumeProfile','fixed_range_volume_profile')//�
 
 var widget = null;
 var shapeMap = new Map();
-var change_remove_status_func;
-var start_draw_status_func;
 
 //画图
 const drowBySymbol = (symbol,time) => {
-    change_remove_status_func(false);
-    start_draw_status_func(false);
+    unsubscribe_event(time);
     var shapeArr = shapeMap.get(symbol);
-	if(shapeArr){
-		for(var index = 0;index < shapeArr.length;index++){
-			var shapeInfo = shapeArr[index];
-			var shape_type = shapeType.get(shapeInfo.shape);
-			if(shape_type){
-				if(/*shapeInfo.draw_status == 0 &&*/ time <= shapeInfo.points[0].time && widget){
-					var entityId = widget.activeChart().createMultipointShape(
-						shapeInfo.points,
-						{
-							shape: shapeType.get(shapeInfo.shape),
-							overrides: shapeInfo.properties,
-						}
-					);
-                    
+    if(shapeArr){
+        for(var index = 0;index < shapeArr.length;index++){
+            var shapeInfo = shapeArr[index];
+            var shape_type = shapeType.get(shapeInfo.shape);
+            if(shape_type){
+                if(/*shapeInfo.draw_status == 0 &&*/ time <= shapeInfo.points[0].time && widget){
                     if(shapeInfo.draw_id) {
                         widget.activeChart().removeEntity(shapeInfo.draw_id);
                         shapeInfo.draw_id = null;
                     }
+                    
+                    var entityId = widget.activeChart().createMultipointShape(
+                        shapeInfo.points,
+                        {
+                            shape: shapeType.get(shapeInfo.shape),
+                            overrides: shapeInfo.properties,
+                        }
+                    );
 
-					if(entityId){
-						shapeInfo.draw_status = 1;
-						shapeInfo.draw_id = entityId
-					}
-				}
-			}
-		}
-	}
-    change_remove_status_func(true);
-    start_draw_status_func(true);
+                    if(entityId){
+                        shapeInfo.draw_status = 1;
+                        shapeInfo.draw_id = entityId
+                    }
+                }
+            }
+        }
+    }
+
+    setTimeout(() => {
+        subscribe_event(time);
+    }, 1000);
 }
 
 const continuousKlines = (pair,interval,startTime,endTime,limit,call) => {
@@ -134,13 +137,24 @@ const continuousKlines = (pair,interval,startTime,endTime,limit,call) => {
 }
 
 export default {
-    //初始化回调函数
-    init_start_draw_status_func(call){
-        start_draw_status_func = call;
+    saveConfig: (symbol,interval) => {
+        axios.post('/tradingview/save',{
+            inerval: interval,
+            symbol: symbol,
+        }).then(function(result){
+            
+        }).catch(function(e){
+            console.error(e)
+            ElMessage.error({message: e, offset: (window.innerHeight / 2) - 50});
+        })
     },
-    //初始化回调函数
-    init_change_remove_status_func(call) {
-        change_remove_status_func = call;
+    inervalData: () => {
+        return inervalData;
+    },
+    drowBySymbol: drowBySymbol,
+    init_subscribe_event_func: (subscribe_func,unsubscribe_func) => {
+        subscribe_event = subscribe_func;
+        unsubscribe_event = unsubscribe_func;
     },
     //获取服务端配置的交易对
     initPairsInfo: async(call) => {
@@ -159,7 +173,7 @@ export default {
                 }
             }
         }).catch(function(e){
-            console.log(e);
+            console.error(e);
         });
         
         //初始化已存储的图纸
@@ -190,7 +204,7 @@ export default {
             }
 
         }).catch(function(e){
-            console.log(e);
+            console.error(e);
             call(cfg);
         });
         
@@ -225,7 +239,7 @@ export default {
                 }
                 shapeArray.push(jsonData);
             }).catch(function(e){
-                console.log(e);
+                console.error(e);
             });
 
         }
@@ -264,7 +278,7 @@ export default {
                     axios.post('/shape/updateShapeInfo',shapeInfo).then(function(result){
                         
                     }).catch(function(e){
-                        console.log(e);
+                        console.error(e);
                         ElMessage.error({message: e, offset: (window.innerHeight / 2) - 50});
                     });
                 }
@@ -273,12 +287,12 @@ export default {
     },
     //图表初始化时调用该函数
     onReady: (callback) => {
-        console.log('[onReady]: Method call');
+        //console.log('[onReady]: Method call');
         setTimeout(() => callback(configurationData));
     },
     //处理用户搜索交易对信息
     searchSymbols: async ( userInput, exchange, symbolType, onResultReadyCallback) => {
-        console.log('[searchSymbols]: Method call');
+        //console.log('[searchSymbols]: Method call');
         var dataArr = [];
         for(var index = 0;index < coinInfo.length;index++){
             var pair = coinInfo[index];
@@ -298,7 +312,7 @@ export default {
         onResultReadyCallback(dataArr)
     },
     resolveSymbol: ( symbolName, onSymbolResolvedCallback, onResolveErrorCallback, extension ) => {
-        console.log('resolveSymbol call.....')
+        //console.log('resolveSymbol call.....')
 
         var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + symbolName + 
             '&contractType=PERPETUAL&interval=15m&limit=1';
@@ -332,7 +346,7 @@ export default {
     },
     //获取k线信息
     getBars: (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
-        console.log('getBars call')
+        //console.log('getBars call')
         
         if(!(periodParams.from < 0 || periodParams.to < 0)){
 
@@ -365,23 +379,14 @@ export default {
     },
     //实时行情订阅
     subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) => {
-        console.log('[subscribeBars]: Method call with subscriberUID:', subscriberUID);
-        axios.post('/tradingview/save',{
-            inerval: resolution,
-            symbol: symbolInfo.name,
-        }).then(function(result){
-            
-        }).catch(function(e){
-            console.log(e)
-            ElMessage.error({message: e, offset: (window.innerHeight / 2) - 50});
-        })
+        //console.log('[subscribeBars]: Method call with subscriberUID:', subscriberUID);
         
         var socketClient = new WebSocket(baseWebSocketUrl + "/ws/" + symbolInfo.name.toLowerCase() + '_perpetual@continuousKline_' + inervalData[resolution].toLowerCase());
         
         clientMap.set(subscriberUID,socketClient);
         
         socketClient.onopen = () => {
-            console.log('WebSocket connection opened,' + socketClient.url);
+            //console.log('WebSocket connection opened,' + socketClient.url);
         };
 
         socketClient.onmessage = (event) => {
@@ -399,7 +404,7 @@ export default {
         };
 
         socketClient.onclose = () => {
-            console.log('WebSocket connection closed,' + socketClient.url);
+            //console.log('WebSocket connection closed,' + socketClient.url);
         };
 
         socketClient.onerror = (error) => {
@@ -409,7 +414,7 @@ export default {
     },
     //取消订阅
     unsubscribeBars: (subscriberUID) => {
-        console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID);
+        //console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID);
         var client = clientMap.get(subscriberUID);
         if(client){
             clientMap.delete(subscriberUID);
