@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, onUnmounted,reactive } from 'vue';
+import { onMounted, ref, onUnmounted,reactive , defineExpose} from 'vue';
 import { widget } from './../../../public/charting_library';
 import Datafeed from './../../datafeeds/binance_datafeed.js';
 import axios from './../../axios';
@@ -263,6 +263,60 @@ onMounted(() => {
 
 });
 
+//显示所有画线信息 start
+const shape_table_data = reactive({
+	data: [],
+	startIndex: 0,
+	currentPage: 1,
+	limit: 10,
+	symbol: '',
+	totalCount: 0,
+	pageCount: 0,
+})
+const shape_table_visible = ref(false);
+
+const queryShape = () => {
+	//shape_table_data.data = [];
+	axios.get("/shape/query?symbol=" +  shape_table_data.symbol + 
+	"&startIndex=" + shape_table_data.startIndex + "&limit=" + shape_table_data.limit).then(function(result){
+		shape_table_data.data = result.list;
+		shape_table_data.startIndex = result.page.startIndex;
+		shape_table_data.pageCount = result.page.pageCount;
+		shape_table_data.currentPage = result.page.currentPage;
+		shape_table_data.totalCount = result.page.totalCount;
+		shape_table_data.limit = result.page.limit;
+		shape_table_visible.value = true;
+	}).catch(function(err){
+		ElMessage.error({message: err.message, offset: (window.innerHeight / 2) - 50});
+	});
+}
+
+const showAllShape = ()=> {
+	queryShape();
+}
+
+const currentChange = ()=>{
+	shape_table_data.startIndex = shape_table_data.currentPage * shape_table_data.limit - shape_table_data.limit;
+	queryShape();
+}
+
+const searchShape = () => {
+	shape_table_data.startIndex = 0;
+	queryShape();
+}
+
+const showSymbol = (symbol) => {
+	if(chartWidget) {
+		chartWidget.activeChart().setSymbol(symbol)
+	}
+}
+
+//显示所有画线信息 end
+
+defineExpose({
+	showAllShape
+})
+
 onUnmounted(() => {
 	if (chartWidget) {
 		chartWidget.remove();
@@ -293,6 +347,66 @@ onUnmounted(() => {
 		</template>
 	</el-dialog>
 	<!--修改水平射线持仓方向表单 END-->
+	<!-- 画线信息列表START -->
+	<el-dialog v-model="shape_table_visible" title="绘图管理">
+		<div>
+			<el-input
+				v-model="shape_table_data.symbol"
+				style="width: 240px"
+				placeholder="请输入要查询的交易对"
+				@keyup.enter="searchShape"
+			>
+			<template #prefix>
+				<el-icon class="el-input__icon"><search /></el-icon>
+			</template>
+			</el-input>
+		</div>
+		<el-table :data="shape_table_data.data" stripe  style="width: 100%" empty-text="无数据">
+			<el-table-column type="selection" width="50" />
+			<el-table-column label="交易对">
+				<template #default="scope">{{ scope.row.symbol }}</template>
+			</el-table-column>
+			<el-table-column label="类型">
+				<template #default="scope">{{ scope.row.shape }}</template>
+			</el-table-column>
+			<el-table-column label="创建时间">
+				<template #default="scope">{{ scope.row.formatCreateTime }}</template>
+			</el-table-column>
+			<el-table-column label="修改时间">
+				<template #default="scope">{{ scope.row.formatUpdateTime }}</template>
+			</el-table-column>
+			<el-table-column label="操作" width="100">
+				<template #default="scope">
+					<el-icon class="handStyle" @click="showSymbol(scope.row.symbol)"><View /></el-icon>
+				</template>
+			</el-table-column>
+		</el-table>
+		<div>&nbsp;</div>
+		<div>
+			<el-pagination
+				v-model:current-page="shape_table_data.currentPage"
+				v-model:page-size="shape_table_data.limit"
+				:page-sizes="[5,10,15,20]"
+				:size="shape_table_data.limit"
+				:disabled="false"
+				:background="true"
+				layout="total, sizes, prev, pager, next, jumper"
+				:total="shape_table_data.totalCount"
+				@size-change="queryShape"
+				@current-change="currentChange"
+			>
+			</el-pagination>
+		</div>
+		<template #footer>
+			<div class="dialog-footer">
+				<!--<el-button @click="horizontal_ray_form_visible = false">关闭</el-button>-->
+				<el-button type="primary" @click="shape_table_visible = false">
+				关闭
+				</el-button>
+			</div>
+		</template>
+	</el-dialog>
+	<!-- 画线信息列表END -->
 </template>
 
 <style scoped>

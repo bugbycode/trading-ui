@@ -1,12 +1,18 @@
 <template>
     <el-row class="chart-row">
         <el-col :span="24" class="chart-col">
-            <tradingViewPage></tradingViewPage>
+            <tradingViewPage ref="tradingPage"></tradingViewPage>
         </el-col>
     </el-row>
 </template>
 <script lang="ts" setup>
     import tradingViewPage from './charts/tradingView.vue';
+    import {defineExpose , ref } from 'vue';
+    var tradingPage = ref(null);
+    const mainShowAllShape = ()=>{
+        tradingPage.value.showAllShape();
+    }
+    defineExpose({mainShowAllShape})
 </script>
 <style scoped>
     /* 使el-row和el-col使用flex布局，并且高度为100% */

@@ -15,6 +15,7 @@
         <el-col :span="8">
             <ul class="userIcon">
                 <el-text class="userInfo">
+                    <el-icon class="handStyle usernameStyle" @click="showAllShape"><AlarmClock /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="showBalance"><Wallet /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="dialogSettingFormVisible = true"><Setting /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="showHmacForm"><Key /></el-icon>
@@ -184,6 +185,8 @@
     import {ref, onMounted ,reactive} from 'vue'
     import axios from './../axios'
 
+    const emit = defineEmits();
+
     const botOrderPnl = reactive({"winning":"50%","pnl":"100"})
 
     var username = ref('')
@@ -198,6 +201,12 @@
             router.push('/login');
         })
     }
+
+    //显示画线信息 start 
+    const showAllShape = ()=>{
+        emit('callShowAllShape');
+    }
+    //显示画线信息 end
 
     //查看余额逻辑 start ======================
     const dialogWalletFormVisible = ref(false);
