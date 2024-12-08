@@ -367,7 +367,7 @@ onUnmounted(() => {
 				<template #default="scope">{{ scope.row.symbol }}</template>
 			</el-table-column>
 			<el-table-column label="类型">
-				<template #default="scope">{{ scope.row.shape }}</template>
+				<template #default="scope">{{ scope.row.shapeTypeMemo }}</template>
 			</el-table-column>
 			<el-table-column label="创建时间">
 				<template #default="scope">{{ scope.row.formatCreateTime }}</template>
