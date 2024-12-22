@@ -120,7 +120,7 @@
                 <el-slider v-model="hmacForm.positionValue" :min="50" :max="1000" show-input />
             </el-form-item>
             <el-form-item label="止损比例" :label-width="hmacFormLabelWidth" >
-                <el-slider v-model="hmacForm.cutLoss" :min="1" :max="10" show-input />
+                <el-slider v-model="hmacForm.cutLoss" :step="0.1" :min="1.0" :max="10.0" show-input />
             </el-form-item>
             <el-form-item label="获利预期" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.6" :max="10" show-input />

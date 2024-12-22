@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base:'/web',
+  //base:'/web',
   plugins: [
     vue(),
   ],
@@ -15,19 +15,7 @@ export default defineConfig({
     }
   },server: {
     proxy: {
-      '/user': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-      },'/shape': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-      },'/login': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-      },'/logout': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-      },'/tradingview': {
+      '/trading': {
         target: 'http://localhost:8080',
         changeOrigin: true,
       }
