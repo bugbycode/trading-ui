@@ -70,7 +70,7 @@ section span:hover
 section .signin
 {
   position: absolute;
-  width: 400px;
+  width: 386px;
   background: #222;  
   z-index: 1000;
   display: flex;
