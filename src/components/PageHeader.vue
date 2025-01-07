@@ -145,6 +145,27 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
+            <el-form-item label="回踩交易" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.tradeStepBack" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="下单通知" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.recvTrade" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="PNL通知" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.recvCrossUnPnl" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="PNL阈值" :label-width="hmacFormLabelWidth" >
+                <el-slider v-model="hmacForm.recvCrossUnPnlPercent" :step="0.1" :min="0.0" :max="100.0" show-input />
+            </el-form-item>
             <el-form-item label="密码验证" :label-width="hmacFormLabelWidth" >
                 <el-input v-model="hmacForm.password" show-password clearable/>
             </el-form-item>
@@ -245,6 +266,10 @@
         positionValue: 50,
         cutLoss: 3,
         profit: 3,
+        recvTrade: 0,
+        recvCrossUnPnl: 0,
+        recvCrossUnPnlPercent: 0,
+        tradeStepBack: 0,
         password: '',
     })
 
@@ -369,6 +394,10 @@
             hmacForm.cutLoss = result.cutLoss;
             hmacForm.profit = result.profit;
             hmacForm.drawTrade = result.drawTrade;
+            hmacForm.recvTrade = result.recvTrade;
+            hmacForm.recvCrossUnPnl = result.recvCrossUnPnl;
+            hmacForm.recvCrossUnPnlPercent = result.recvCrossUnPnlPercent;
+            hmacForm.tradeStepBack = result.tradeStepBack;
         }).catch(function(err){
             
         })
