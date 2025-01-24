@@ -151,6 +151,12 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
+            <!--<el-form-item label="交易风格" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.tradeStyle" size="small">
+                    <el-radio-button label="激进" :value="1" />
+                    <el-radio-button label="保守" :value="0"/>
+                </el-radio-group>
+            </el-form-item>-->
             <el-form-item label="下单通知" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.recvTrade" size="small">
                     <el-radio-button label="开启" :value="1" />
@@ -271,6 +277,7 @@
         recvCrossUnPnlPercent: 0,
         tradeStepBack: 0,
         password: '',
+        tradeStyle: 0,
     })
 
     const changeApiSetting = ()=>{
@@ -291,6 +298,7 @@
     }
 
     const showHmacForm = ()=>{
+        checkOnline();
         dialogHmacFormVisible.value = true;
         hmacForm.password = '';
         getUserInfo();
@@ -398,6 +406,7 @@
             hmacForm.recvCrossUnPnl = result.recvCrossUnPnl;
             hmacForm.recvCrossUnPnlPercent = result.recvCrossUnPnlPercent;
             hmacForm.tradeStepBack = result.tradeStepBack;
+            hmacForm.tradeStyle = result.tradeStyle;
         }).catch(function(err){
             
         })
