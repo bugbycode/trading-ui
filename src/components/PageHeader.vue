@@ -123,7 +123,10 @@
                 <el-slider v-model="hmacForm.cutLoss" :step="0.1" :min="1.0" :max="10.0" show-input />
             </el-form-item>
             <el-form-item label="获利预期" :label-width="hmacFormLabelWidth" >
-                <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.6" :max="10" show-input />
+                <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.6" :max="10.0" show-input />
+            </el-form-item>
+            <el-form-item v-if="hmacForm.tradeStyle == 0" label="止盈限制" :label-width="hmacFormLabelWidth" >
+                <el-slider v-model="hmacForm.profitLimit" :step="0.1" :min="0.1" :max="100.0" show-input />
             </el-form-item>
             <el-form-item label="交易指标" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.autoTradeType" size="small">
@@ -151,12 +154,12 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <!--<el-form-item label="交易风格" :label-width="hmacFormLabelWidth" >
+            <el-form-item label="交易风格" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.tradeStyle" size="small">
                     <el-radio-button label="激进" :value="1" />
                     <el-radio-button label="保守" :value="0"/>
                 </el-radio-group>
-            </el-form-item>-->
+            </el-form-item>
             <el-form-item label="下单通知" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.recvTrade" size="small">
                     <el-radio-button label="开启" :value="1" />
@@ -278,10 +281,10 @@
         tradeStepBack: 0,
         password: '',
         tradeStyle: 0,
+        profitLimit: 4,
     })
 
     const changeApiSetting = ()=>{
-        checkOnline();
         axios.post('/user/changeHmac',hmacForm).then(function(result){
             if(result.code == 1){
                 ElMessage.error({message: result.message, offset: (window.innerHeight / 2)});
@@ -292,8 +295,10 @@
                 form.newPwd = '';
                 form.confirmPwd = '';
             }
+            checkOnline();
         }).catch(function(err){
             ElMessage.error({message: err, offset: (window.innerHeight / 2)});
+            checkOnline();
         });
     }
 
@@ -407,6 +412,7 @@
             hmacForm.recvCrossUnPnlPercent = result.recvCrossUnPnlPercent;
             hmacForm.tradeStepBack = result.tradeStepBack;
             hmacForm.tradeStyle = result.tradeStyle;
+            hmacForm.profitLimit = result.profitLimit;
         }).catch(function(err){
             
         })
