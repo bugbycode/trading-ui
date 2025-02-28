@@ -89,6 +89,12 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
+            <el-form-item label="量价监控" :label-width="settingLabelWidth" >
+                <el-radio-group v-model="settingForm.volumeMonitor" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
         </el-form>
         <template #footer>
         <div class="dialog-footer">
@@ -362,6 +368,7 @@
         emaRiseAndFall: 0,//是否订阅行情异动监控 0：否 1：是
         highOrLowMonitor: 0,//是否订阅标志性高低点监控 0：否 1：是
         areaMonitor: 0,//是否订阅盘整区间监控 0：否 1：是
+        volumeMonitor: 0,//是否启用量价分析 0：否 1：是
     });
 
     const changeSetting = () => {
@@ -397,6 +404,7 @@
             settingForm.highOrLowMonitor = result.highOrLowMonitor;
             settingForm.riseAndFallMonitor = result.riseAndFallMonitor;
             settingForm.areaMonitor = result.areaMonitor;
+            settingForm.volumeMonitor = result.volumeMonitor;
             hmacForm.autoTrade = result.autoTrade;
             hmacForm.autoTradeType = result.autoTradeType;
             hmacForm.binanceApiKey = result.binanceApiKey;
