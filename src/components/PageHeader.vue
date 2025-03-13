@@ -17,7 +17,7 @@
                 <el-text class="userInfo">
                     <el-icon class="handStyle usernameStyle" @click="showAllShape"><AlarmClock /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="showBalance"><Wallet /></el-icon>
-                    <el-icon class="handStyle usernameStyle" @click="dialogSettingFormVisible = true"><Setting /></el-icon>
+                    <el-icon class="handStyle usernameStyle" @click="openSettingForm"><Setting /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="showHmacForm"><Key /></el-icon>
                     <el-icon><UserFilled /></el-icon>
                     <span class="handStyle usernameStyle" @click="dialogFormVisible = true">{{maskEmail(username)}}</span>
@@ -160,6 +160,12 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
+            <el-form-item v-if="hmacForm.autoTradeType == 0" label="逆势交易" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.countertrendTrading" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
             <el-form-item label="交易风格" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.tradeStyle" size="small">
                     <el-radio-button label="激进" :value="1" />
@@ -288,6 +294,7 @@
         password: '',
         tradeStyle: 0,
         profitLimit: 4,
+        countertrendTrading: 0,
     })
 
     const changeApiSetting = ()=>{
@@ -371,6 +378,11 @@
         volumeMonitor: 0,//是否启用量价分析 0：否 1：是
     });
 
+    const openSettingForm = () => {
+        dialogSettingFormVisible.value = true;
+        checkOnline();
+    }
+
     const changeSetting = () => {
         checkOnline();
         //console.log(JSON.stringify(settingForm));
@@ -421,6 +433,7 @@
             hmacForm.tradeStepBack = result.tradeStepBack;
             hmacForm.tradeStyle = result.tradeStyle;
             hmacForm.profitLimit = result.profitLimit;
+            hmacForm.countertrendTrading = result.countertrendTrading;
         }).catch(function(err){
             
         })
