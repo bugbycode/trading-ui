@@ -111,7 +111,7 @@
     <el-dialog v-model="dialogHmacFormVisible" title="币安HMAC配置" width="500">
         <el-form :model="settingForm">
             <el-form-item label="公钥信息" :label-width="hmacFormLabelWidth" >
-                <el-input v-model="hmacForm.binanceApiKey" />
+                <el-input v-model="hmacForm.binanceApiKey" clearable/>
             </el-form-item>
             <el-form-item label="私钥信息" :label-width="hmacFormLabelWidth" >
                 <el-input v-model="hmacForm.binanceSecretKey" show-password clearable/>
