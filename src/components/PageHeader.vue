@@ -71,7 +71,7 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="指数均线分析" :label-width="settingLabelWidth" >
+            <el-form-item label="指数均线" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.emaRiseAndFall" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
