@@ -71,6 +71,7 @@ section .signin
 {
   position: absolute;
   width: 386px;
+  min-width: 386px;
   background: #222;  
   z-index: 1000;
   display: flex;
