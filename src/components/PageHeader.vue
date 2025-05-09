@@ -18,6 +18,7 @@
                     <el-icon class="handStyle usernameStyle" @click="showAllShape"><AlarmClock /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="showBalance"><Wallet /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="openSettingForm"><Setting /></el-icon>
+                    <el-icon class="handStyle usernameStyle" @click="openEmailForm"><Message /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="showHmacForm"><Key /></el-icon>
                     <el-icon><UserFilled /></el-icon>
                     <span class="handStyle usernameStyle" @click="dialogFormVisible = true">{{maskEmail(username)}}</span>
@@ -26,6 +27,34 @@
             </ul>
         </el-col>
     </el-row>
+
+    <!--邮件表单START-->
+    <el-dialog v-model="dialogEmailFormVisible" title="SMTP配置" width="500">
+        <el-form :model="emailForm">
+            <el-form-item label="账号" :label-width="formLabelWidth" >
+                <el-input type="text" v-model="emailForm.smtpUser" placeholder="请输入账号" autocomplete="off" clearable/>
+            </el-form-item>
+            <el-form-item label="密码" :label-width="formLabelWidth" >
+                <el-input type="password" v-model="emailForm.smtpPwd" placeholder="请输入密码" autocomplete="off" show-password clearable/>
+            </el-form-item>
+            <el-form-item label="服务" :label-width="formLabelWidth" >
+                <el-input type="text" v-model="emailForm.smtpHost" placeholder="请输入地址" autocomplete="off" clearable/>
+            </el-form-item>
+            <el-form-item label="端口" :label-width="formLabelWidth" >
+                <el-input type="text" v-model="emailForm.smtpPort" placeholder="请输入端口" autocomplete="off" clearable/>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+        <div class="dialog-footer">
+            <el-button @click="dialogEmailFormVisible = false">取消</el-button>
+            <el-button type="primary" @click="saveEmail">
+                确定
+            </el-button>
+        </div>
+        </template>
+    </el-dialog>
+    <!--邮件表单END-->
+
     <!--修改密码表单START-->
     <el-dialog v-model="dialogFormVisible" title="重置密码" width="500">
         <el-form :model="form">
@@ -244,6 +273,38 @@
         })
     }
 
+    //邮箱认证start
+    const dialogEmailFormVisible = ref(false);
+
+    var emailForm = reactive({
+        smtpUser: '',
+        smtpPwd: '',
+        smtpHost: '',
+        smtpPort: '',
+    })
+
+    const openEmailForm = () => {
+        checkOnline();
+        dialogEmailFormVisible.value = true;
+        getUserInfo();
+    }
+
+    const saveEmail = () => {
+        axios.post('/user/saveSmtpSetting',emailForm).then(function(result){
+            if(result.code == 1){
+                ElMessage.error({message: result.message, offset: (window.innerHeight / 2)});
+            } else if(result.code == 0){
+                ElMessage.success({message: result.message, offset: (window.innerHeight / 2)});
+                dialogEmailFormVisible.value = false;
+            }
+            checkOnline();
+        }).catch(function(err){
+            checkOnline();
+        })
+    }
+
+    //邮箱认证end
+
     //显示画线信息 start 
     const showAllShape = ()=>{
         emit('callShowAllShape');
@@ -434,6 +495,10 @@
             hmacForm.tradeStyle = result.tradeStyle;
             hmacForm.profitLimit = result.profitLimit;
             hmacForm.countertrendTrading = result.countertrendTrading;
+            emailForm.smtpHost = result.smtpHost;
+            emailForm.smtpPort = new String(result.smtpPort);
+            emailForm.smtpUser = result.smtpUser;
+            emailForm.smtpPwd = result.smtpPwd;
         }).catch(function(err){
             
         })
