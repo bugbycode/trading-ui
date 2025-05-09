@@ -24,7 +24,7 @@
       <div class="links"> <a href="#">Forgot Password</a> <a href="#">Signup</a> 
 
       </div> -->
-      <div class="inputBox">
+      <div class="inputBox" v-if="hostname != 'localhost' && hostname != '127.0.0.1'">
         <!--<div class="g-recaptcha" data-sitekey="6LfFqqgqAAAAABzTIIXG14jhLL-Gwr1nFVvCrpi0" data-theme="dark"></div>-->
         <vueRecaptcha 
           sitekey="6LfFqqgqAAAAABzTIIXG14jhLL-Gwr1nFVvCrpi0"
@@ -69,7 +69,9 @@
     }
     //验证过期
     const recaptchaExpired = ()=>{
-      gcha.value.reset();
+      if(gcha.value) {
+        gcha.value.reset();
+      }
       cha_response.value = '';
     }
     //验证失败 
@@ -86,6 +88,8 @@
       
     })
 
+    const hostname = document.location.hostname;
+    
     //登录表单信息
     var userInput = ref('');
     var passInput = ref('');
@@ -98,7 +102,7 @@
         ElMessage.error({message: '请输入账号', offset: (window.innerHeight / 2) - 50});
       } else if(password == ''){
         ElMessage.error({message: '请输入密码', offset: (window.innerHeight / 2) + 20});
-      } else if(cha_responseValue == '') {
+      } else if(cha_responseValue == '' && hostname != 'localhost' && hostname != '127.0.0.1') {
         ElMessage.error({message: '请先验证人机身份', offset: (window.innerHeight / 2) - 50});
       } else {
         const formData = new FormData();
