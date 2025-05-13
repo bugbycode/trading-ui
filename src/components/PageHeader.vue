@@ -31,17 +31,29 @@
     <!--邮件表单START-->
     <el-dialog v-model="dialogEmailFormVisible" title="SMTP配置" width="500">
         <el-form :model="emailForm">
-            <el-form-item label="账号" :label-width="formLabelWidth" >
-                <el-input type="text" v-model="emailForm.smtpUser" placeholder="请输入账号" autocomplete="off" clearable/>
-            </el-form-item>
-            <el-form-item label="密码" :label-width="formLabelWidth" >
-                <el-input type="password" v-model="emailForm.smtpPwd" placeholder="请输入密码" autocomplete="off" show-password clearable/>
-            </el-form-item>
             <el-form-item label="服务" :label-width="formLabelWidth" >
                 <el-input type="text" v-model="emailForm.smtpHost" placeholder="请输入地址" autocomplete="off" clearable/>
             </el-form-item>
             <el-form-item label="端口" :label-width="formLabelWidth" >
                 <el-input type="text" v-model="emailForm.smtpPort" placeholder="请输入端口" autocomplete="off" clearable/>
+            </el-form-item>
+            <el-form-item label="账号1" :label-width="formLabelWidth" >
+                <el-input type="text" v-model="emailForm.smtpUser" placeholder="请输入账号" autocomplete="off" clearable/>
+            </el-form-item>
+            <el-form-item label="密码1" :label-width="formLabelWidth" >
+                <el-input type="password" v-model="emailForm.smtpPwd" placeholder="请输入密码" autocomplete="off" show-password clearable/>
+            </el-form-item>
+            <el-form-item label="账号2" :label-width="formLabelWidth" >
+                <el-input type="text" v-model="emailForm.smtpUser2" placeholder="请输入账号" autocomplete="off" clearable/>
+            </el-form-item>
+            <el-form-item label="密码2" :label-width="formLabelWidth" >
+                <el-input type="password" v-model="emailForm.smtpPwd2" placeholder="请输入密码" autocomplete="off" show-password clearable/>
+            </el-form-item>
+            <el-form-item label="账号3" :label-width="formLabelWidth" >
+                <el-input type="text" v-model="emailForm.smtpUser3" placeholder="请输入账号" autocomplete="off" clearable/>
+            </el-form-item>
+            <el-form-item label="密码3" :label-width="formLabelWidth" >
+                <el-input type="password" v-model="emailForm.smtpPwd3" placeholder="请输入密码" autocomplete="off" show-password clearable/>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -277,10 +289,14 @@
     const dialogEmailFormVisible = ref(false);
 
     var emailForm = reactive({
-        smtpUser: '',
-        smtpPwd: '',
         smtpHost: '',
         smtpPort: '',
+        smtpUser: '',
+        smtpPwd: '',
+        smtpUser2: '',
+        smtpPwd2: '',
+        smtpUser3: '',
+        smtpPwd3: '',
     })
 
     const openEmailForm = () => {
@@ -499,6 +515,10 @@
             emailForm.smtpPort = new String(result.smtpPort);
             emailForm.smtpUser = result.smtpUser;
             emailForm.smtpPwd = result.smtpPwd;
+            emailForm.smtpUser2 = result.smtpUser2;
+            emailForm.smtpPwd2 = result.smtpPwd2;
+            emailForm.smtpUser3 = result.smtpUser3;
+            emailForm.smtpPwd3 = result.smtpPwd3;
         }).catch(function(err){
             
         })
