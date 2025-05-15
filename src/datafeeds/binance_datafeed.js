@@ -229,6 +229,7 @@ export default {
         //绘图坐标 [{price:double,time:Long}]
         var points = iLineDataSourceApi.getPoints();
         var shape_type = shapeType.get(iLineDataSourceApi._source.toolname);
+        var interval = inervalData[widget.activeChart().resolution()];
         if(shape_type){
             var jsonData = {
                 draw_id: id,
@@ -237,6 +238,7 @@ export default {
                 points: JSON.stringify(points),
                 properties: JSON.stringify(properties),
                 draw_status: 1,
+                interval: interval,
             }
             axios.post('/shape/saveShapeInfo',jsonData).then(function(result){
                 jsonData._id = result.id;
@@ -291,6 +293,7 @@ export default {
         var properties = iLineDataSourceApi.getProperties();
         //绘图坐标 [{price:double,time:Long}]
         var points = iLineDataSourceApi.getPoints();
+        var interval = inervalData[widget.activeChart().resolution()];
         //已存储的
         var shapeArray = shapeMap.get(symbol);
         if(shapeArray){
@@ -300,6 +303,7 @@ export default {
                     shapeInfo.id = shapeInfo._id;
                     shapeInfo.properties = JSON.stringify(properties);
                     shapeInfo.points = JSON.stringify(points);
+                    shapeInfo.interval = interval;
                     axios.post('/shape/updateShapeInfo',shapeInfo).then(function(result){
                         //水平射线可修改持仓方向
                         //if(shapeInfo.shape == 'LineToolHorzRay') {
