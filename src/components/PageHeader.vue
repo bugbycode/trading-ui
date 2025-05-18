@@ -198,12 +198,12 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <!--<el-form-item v-if="hmacForm.autoTradeType == 0" label="回踩交易" :label-width="hmacFormLabelWidth" >
+            <el-form-item v-if="hmacForm.autoTradeType == 0" label="回踩交易" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.tradeStepBack" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
-            </el-form-item>-->
+            </el-form-item>
             <!--<el-form-item v-if="hmacForm.autoTradeType == 0" label="逆势交易" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.countertrendTrading" size="small">
                     <el-radio-button label="开启" :value="1" />
