@@ -51,6 +51,13 @@ var coinInfo = [
     '1000PEPEUSDT'
 ]
 
+var coinInfoMap = {
+    'BTC': {
+        pair: 'BTCUSDT',
+        contractType:'PERPETUAL'
+    }
+}
+
 const shapeType = new Map();
 shapeType.set('LineToolTrendLine','trend_line');//趋势线
 shapeType.set('LineToolRay','ray');//射线
@@ -103,15 +110,16 @@ const drowBySymbol = (symbol,time) => {
     }, 1000);
 }
 
-const continuousKlines = (pair,interval,startTime,endTime,limit,call) => {
+const continuousKlines = (pair,contractType,interval,startTime,endTime,limit,call) => {
     var loading = ElLoading.service({
         lock: true,
         text: 'Loading',
         background: 'rgba(0, 0, 0, 0.7)',
     })
+    //var pairInfo = coinInfoMap[pair];
     var newData = [];
     var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + pair + 
-            '&contractType=PERPETUAL&interval=' + interval + '&startTime=' + startTime 
+            '&contractType=' + contractType + '&interval=' + interval + '&startTime=' + startTime 
             + '&endTime=' + endTime + '&limit=' + limit;
     axios_.get(url).then(function(response){
         response.data.forEach(function(d,i){
@@ -173,47 +181,54 @@ export default {
         axios_.get(baseHttpUrl + '/fapi/v1/exchangeInfo').then(function(result){
             if(result && result.status == 200){
                 coinInfo = [];
+                coinInfoMap = {};
                 var symbols = result.data.symbols;
                 for(var index = 0;index < symbols.length;index++){
-                    if(symbols[index].contractType == 'PERPETUAL' && symbols[index].status == 'TRADING'){
+                    if(symbols[index].contractType == 'PERPETUAL' && symbols[index].status == 'TRADING' || symbols[index].contractType == 'CURRENT_QUARTER' || symbols[index].contractType == 'NEXT_QUARTER'){
                         coinInfo.push(symbols[index].symbol)
+                        var symbol = symbols[index].symbol;
+                        var pair = symbols[index].pair;
+                        var contractType = symbols[index].contractType;
+                        coinInfoMap[symbol] = {'pair' : pair, 'contractType' : contractType};
                     }
                 }
-            }
-        }).catch(function(e){
-            console.error(e);
-        });
+                //console.log(coinInfoMap)
+                
         
-        //初始化已存储的图纸
-        axios.get('/shape/getAllShapeInfo').then(function(all_shape){
-            if(all_shape && all_shape.length > 0 && all_shape[0].symbol){
-                for(var index = 0;index < all_shape.length;index++){
-                    var shapeInfo = all_shape[index];
-                    var shapeArr = shapeMap.get(shapeInfo.symbol);
-                    if(shapeArr == undefined){
-                        shapeArr = [];
-                        shapeMap.set(shapeInfo.symbol,shapeArr);
+                //初始化已存储的图纸
+                axios.get('/shape/getAllShapeInfo').then(function(all_shape){
+                    if(all_shape && all_shape.length > 0 && all_shape[0].symbol){
+                        for(var index = 0;index < all_shape.length;index++){
+                            var shapeInfo = all_shape[index];
+                            var shapeArr = shapeMap.get(shapeInfo.symbol);
+                            if(shapeArr == undefined){
+                                shapeArr = [];
+                                shapeMap.set(shapeInfo.symbol,shapeArr);
+                            }
+                            shapeArr.push({
+                                _id: shapeInfo.id,//服务端存储的数据库唯一标识
+                                draw_id: '',//界面绘图生成的id
+                                owner: shapeInfo.owner,
+                                symbol: shapeInfo.symbol,
+                                shape: shapeInfo.shape,
+                                points: JSON.parse(shapeInfo.points),
+                                properties: JSON.parse(shapeInfo.properties),
+                                draw_status: 1,//是否可绘图 0：否 1：是
+                            })
+                        }
+                    };
+
+                    if(call){
+                        call(cfg);
                     }
-                    shapeArr.push({
-                        _id: shapeInfo.id,//服务端存储的数据库唯一标识
-                        draw_id: '',//界面绘图生成的id
-                        owner: shapeInfo.owner,
-                        symbol: shapeInfo.symbol,
-                        shape: shapeInfo.shape,
-                        points: JSON.parse(shapeInfo.points),
-                        properties: JSON.parse(shapeInfo.properties),
-                        draw_status: 1,//是否可绘图 0：否 1：是
-                    })
-                }
-            };
 
-            if(call){
-                call(cfg);
+                }).catch(function(e){
+                    console.error(e);
+                    call(cfg);
+                });
             }
-
         }).catch(function(e){
             console.error(e);
-            call(cfg);
         });
         
     },
@@ -353,9 +368,9 @@ export default {
     },
     resolveSymbol: ( symbolName, onSymbolResolvedCallback, onResolveErrorCallback, extension ) => {
         //console.log('resolveSymbol call.....')
-
-        var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + symbolName + 
-            '&contractType=PERPETUAL&interval=15m&limit=1';
+        var pairInfo = coinInfoMap[symbolName];
+        var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + pairInfo.pair + 
+            '&contractType=' + pairInfo.contractType + '&interval=15m&limit=1';
         axios_.get(url).then(function(response){
             var price = response.data[0][3];
             var index = price.indexOf('.');
@@ -389,11 +404,11 @@ export default {
         //console.log('getBars call')
         
         if(!(periodParams.from < 0 || periodParams.to < 0)){
-
-            continuousKlines(symbolInfo.name,inervalData[resolution],(periodParams.from * 1000),(periodParams.to * 1000),1500,function(newData){
+            var pairInfo = coinInfoMap[symbolInfo.name];
+            continuousKlines(pairInfo.pair, pairInfo.contractType, inervalData[resolution],(periodParams.from * 1000),(periodParams.to * 1000),1500,function(newData){
                 if(newData.length == 1500) {
                     var t = newData[newData.length - 1].time;
-                    continuousKlines(symbolInfo.name,inervalData[resolution],
+                    continuousKlines(pairInfo.pair, pairInfo.contractType, inervalData[resolution],
                         newData[newData.length - 1].closeTime,(periodParams.to * 1000),1500,function(secData){
                         for(var index = 0;index < secData.length;index++){
                             if(secData[index].time == t){
@@ -420,8 +435,10 @@ export default {
     //实时行情订阅
     subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) => {
         //console.log('[subscribeBars]: Method call with subscriberUID:', subscriberUID);
-        
-        var socketClient = new WebSocket(baseWebSocketUrl + "/ws/" + symbolInfo.name.toLowerCase() + '_perpetual@continuousKline_' + inervalData[resolution].toLowerCase());
+        var coinInfo = coinInfoMap[symbolInfo.name];
+        var url = baseWebSocketUrl + "/ws/" + coinInfo.pair.toLowerCase() + '_' + coinInfo.contractType.toLowerCase() + '@continuousKline_' + inervalData[resolution].toLowerCase();
+        //console.log(url);
+        var socketClient = new WebSocket(url);
         
         clientMap.set(subscriberUID,socketClient);
         
