@@ -110,39 +110,107 @@ const drowBySymbol = (symbol,time) => {
     }, 1000);
 }
 
-const continuousKlines = (pair,contractType,interval,startTime,endTime,limit,call) => {
+const continuousKlines = (pair,contractType,child_contractType,interval,startTime,endTime,limit,call) => {
     var loading = ElLoading.service({
         lock: true,
         text: 'Loading',
         background: 'rgba(0, 0, 0, 0.7)',
     })
-    //var pairInfo = coinInfoMap[pair];
-    var newData = [];
-    var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + pair + 
-            '&contractType=' + contractType + '&interval=' + interval + '&startTime=' + startTime 
-            + '&endTime=' + endTime + '&limit=' + limit;
-    axios_.get(url).then(function(response){
-        response.data.forEach(function(d,i){
-            newData.push({
-                time:d[0],
-                open:Number(d[1]),
-                high:Number(d[2]),
-                low:Number(d[3]),
-                close:Number(d[4]),
-                volume: Number(d[5]),
-                closeTime: d[6],
+    //console.log(child_contractType);
+    if(child_contractType) {
+        //var pairInfo = coinInfoMap[pair];
+        var newData = [];
+        var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + pair + 
+                '&contractType=' + contractType + '&interval=' + interval + '&startTime=' + startTime 
+                + '&endTime=' + endTime + '&limit=' + limit;
+        axios_.get(url).then(function(response){
+            response.data.forEach(function(d,i){
+                newData.push({
+                    time:d[0],
+                    open:Number(d[1]),
+                    high:Number(d[2]),
+                    low:Number(d[3]),
+                    close:Number(d[4]),
+                    volume: Number(d[5]),
+                    closeTime: d[6],
+                });
+            })
+
+            var childUrl = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + pair + 
+                '&contractType=' + child_contractType + '&interval=' + interval + '&startTime=' + startTime 
+                + '&endTime=' + endTime + '&limit=' + limit;
+            var childNewData = [];
+            axios_.get(childUrl).then(function(response){
+                response.data.forEach(function(d,i){
+                    childNewData.push({
+                        time:d[0],
+                        open:Number(d[1]),
+                        high:Number(d[2]),
+                        low:Number(d[3]),
+                        close:Number(d[4]),
+                        volume: Number(d[5]),
+                        closeTime: d[6],
+                    });
+                })
+                if(call){
+                    //console.log(childNewData)
+                    for(var index = 0;index < newData.length;index++) {
+                        //console.log(newData[index])
+                        //console.log(childNewData[index].open + ' - ' + newData[index].open)
+                        newData[index].open = newData[index].open - childNewData[index].open;
+                        newData[index].high = newData[index].high - childNewData[index].high;
+                        newData[index].low = newData[index].low - childNewData[index].low;
+                        newData[index].close = newData[index].close - childNewData[index].close;
+                    }
+                    call(newData);
+                }
+                loading.close();
+            }).catch(function(err){
+                call([]);
+                console.error(err);
+                loading.close();
+                ElMessage.error({message: err, offset: (window.innerHeight / 2) - 50});
             });
-        })
-        if(call){
+            /*if(call){
+                call(newData);
+            }
+            loading.close();*/
+        }).catch(function(err){
+            call([]);
+            console.error(err);
+            loading.close();
+            ElMessage.error({message: err, offset: (window.innerHeight / 2) - 50});
+        });
+    } else {
+
+        //var pairInfo = coinInfoMap[pair];
+        var newData = [];
+        var url = baseHttpUrl + "/fapi/v1/continuousKlines?pair=" + pair + 
+                '&contractType=' + contractType + '&interval=' + interval + '&startTime=' + startTime 
+                + '&endTime=' + endTime + '&limit=' + limit;
+        axios_.get(url).then(function(response){
+            response.data.forEach(function(d,i){
+                newData.push({
+                    time:d[0],
+                    open:Number(d[1]),
+                    high:Number(d[2]),
+                    low:Number(d[3]),
+                    close:Number(d[4]),
+                    volume: Number(d[5]),
+                    closeTime: d[6],
+                });
+            })
+            if(call){
+                call(newData);
+            }
+            loading.close();
+        }).catch(function(err){
             call(newData);
-        }
-        loading.close();
-    }).catch(function(err){
-        call(newData);
-        console.error(err);
-        loading.close();
-        ElMessage.error({message: err, offset: (window.innerHeight / 2) - 50});
-    });
+            console.error(err);
+            loading.close();
+            ElMessage.error({message: err, offset: (window.innerHeight / 2) - 50});
+        });
+    }
     
 }
 
@@ -190,6 +258,19 @@ export default {
                         var pair = symbols[index].pair;
                         var contractType = symbols[index].contractType;
                         coinInfoMap[symbol] = {'pair' : pair, 'contractType' : contractType};
+                        //溢价信息配置
+                        if(contractType == 'CURRENT_QUARTER' || contractType == 'NEXT_QUARTER') {
+                            
+                            //contractType = contractType + '@PERPETUAL';
+                            
+                            var premiumSymbol = symbol + '_PREMIUN';
+                            coinInfo.push(premiumSymbol);
+
+                            coinInfoMap[premiumSymbol] = {
+                                'pair' : pair, 'contractType' : contractType,
+                                'child_pair' : pair, 'child_contractType' : 'PERPETUAL'
+                            }
+                        }
                     }
                 }
                 //console.log(coinInfoMap)
@@ -405,10 +486,10 @@ export default {
         
         if(!(periodParams.from < 0 || periodParams.to < 0)){
             var pairInfo = coinInfoMap[symbolInfo.name];
-            continuousKlines(pairInfo.pair, pairInfo.contractType, inervalData[resolution],(periodParams.from * 1000),(periodParams.to * 1000),1500,function(newData){
+            continuousKlines(pairInfo.pair, pairInfo.contractType, pairInfo.child_contractType, inervalData[resolution],(periodParams.from * 1000),(periodParams.to * 1000),1500,function(newData){
                 if(newData.length == 1500) {
                     var t = newData[newData.length - 1].time;
-                    continuousKlines(pairInfo.pair, pairInfo.contractType, inervalData[resolution],
+                    continuousKlines(pairInfo.pair, pairInfo.contractType, pairInfo.child_contractType, inervalData[resolution],
                         newData[newData.length - 1].closeTime,(periodParams.to * 1000),1500,function(secData){
                         for(var index = 0;index < secData.length;index++){
                             if(secData[index].time == t){
@@ -436,6 +517,9 @@ export default {
     subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) => {
         //console.log('[subscribeBars]: Method call with subscriberUID:', subscriberUID);
         var coinInfo = coinInfoMap[symbolInfo.name];
+        if(coinInfo.child_contractType) {
+            return false;
+        }
         var url = baseWebSocketUrl + "/ws/" + coinInfo.pair.toLowerCase() + '_' + coinInfo.contractType.toLowerCase() + '@continuousKline_' + inervalData[resolution].toLowerCase();
         //console.log(url);
         var socketClient = new WebSocket(url);
