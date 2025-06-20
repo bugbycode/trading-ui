@@ -152,7 +152,7 @@
     <!--修改用户信息表单END-->
 
     <!--修改Hmac Sha256信息表单 START -->
-    <el-dialog v-model="dialogHmacFormVisible" title="币安HMAC配置" width="500">
+    <el-dialog v-model="dialogHmacFormVisible" title="币安HMAC配置" width="600">
         <el-form :model="settingForm">
             <el-form-item label="公钥信息" :label-width="hmacFormLabelWidth" >
                 <el-input v-model="hmacForm.binanceApiKey" clearable/>
@@ -184,6 +184,16 @@
                     <el-radio-button label="指数均线" :value="2" />
                     <el-radio-button label="价格行为" :value="1" />
                     <el-radio-button label="价格回撤" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item v-if="hmacForm.autoTradeType == 0" label="回撤比例" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.fibLevel" size="small">
+                    <el-radio-button label="Lv0(0.236)" :value="0" />
+                    <el-radio-button label="Lv1(0.382)" :value="1" />
+                    <el-radio-button label="Lv2(0.5)" :value="2" />
+                    <el-radio-button label="Lv3(0.618)" :value="3" />
+                    <el-radio-button label="Lv4(0.786)" :value="4" />
+                    <el-radio-button label="Lv5(1.0)" :value="5" />
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="自动交易" :label-width="hmacFormLabelWidth" >
@@ -375,6 +385,7 @@
         tradeStyle: 0,
         profitLimit: 4,
         countertrendTrading: 0,
+        fibLevel: 0,
     })
 
     const changeApiSetting = ()=>{
@@ -516,6 +527,7 @@
             hmacForm.tradeStyle = result.tradeStyle;
             hmacForm.profitLimit = result.profitLimit;
             hmacForm.countertrendTrading = result.countertrendTrading;
+            hmacForm.fibLevel = result.fibLevel;
             emailForm.smtpHost = result.smtpHost;
             emailForm.smtpPort = new String(result.smtpPort);
             emailForm.smtpUser = result.smtpUser;
