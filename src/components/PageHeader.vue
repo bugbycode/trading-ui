@@ -160,6 +160,9 @@
             <el-form-item label="私钥信息" :label-width="hmacFormLabelWidth" >
                 <el-input v-model="hmacForm.binanceSecretKey" show-password clearable/>
             </el-form-item>
+            <el-form-item label="市场热度" :label-width="hmacFormLabelWidth" >
+                <el-slider v-model="hmacForm.tradeNumber" :step="1" :min="1" :max="1000" :marks="marksTradeNumber" show-input />
+            </el-form-item>
             <el-form-item label="名义价值" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.baseStepSize" :min="1" :max="100" show-input />
             </el-form-item>
@@ -274,11 +277,19 @@
     <!--余额信息END-->
 
 </template>
-<script setup>
+<script lang="ts" setup>
     import { ElMessageBox, ElMessage } from 'element-plus'
     import { useRoute, useRouter } from 'vue-router'
 
     import {ref, onMounted ,reactive} from 'vue'
+
+    import type { CSSProperties } from 'vue'
+
+    interface Mark {
+        style: CSSProperties
+        label: string
+    }
+
     import axios from './../axios'
 
     const emit = defineEmits();
@@ -364,6 +375,14 @@
 
     //修改Hmac Sha256信息表单 start ===============
 
+    const marksTradeNumber = reactive<Marks>({
+        //1: '1',
+        60: '60',
+        200: '200',
+        500: '500',
+        1000: '1000',
+    })
+
     const dialogHmacFormVisible = ref(false);
     const hmacFormLabelWidth = '100px';
     var hmacForm = reactive({
@@ -386,6 +405,7 @@
         profitLimit: 4,
         countertrendTrading: 0,
         fibLevel: 0,
+        tradeNumber: 60,
     })
 
     const changeApiSetting = ()=>{
@@ -528,6 +548,7 @@
             hmacForm.profitLimit = result.profitLimit;
             hmacForm.countertrendTrading = result.countertrendTrading;
             hmacForm.fibLevel = result.fibLevel;
+            hmacForm.tradeNumber = result.tradeNumber;
             emailForm.smtpHost = result.smtpHost;
             emailForm.smtpPort = new String(result.smtpPort);
             emailForm.smtpUser = result.smtpUser;
