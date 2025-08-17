@@ -139,6 +139,9 @@
             <el-form-item label="振幅过滤" :label-width="settingLabelWidth" >
                 <el-slider v-model="settingForm.monitorProfit" :step="0.1" :min="1" :max="10.0" show-input />
             </el-form-item>
+            <el-form-item label="热度过滤" :label-width="settingLabelWidth" >
+                <el-slider v-model="settingForm.tradeNumberMonitor" :step="1" :min="1" :max="1000" :marks="marksTradeNumber" show-input />
+            </el-form-item>
         </el-form>
         <template #footer>
         <div class="dialog-footer">
@@ -488,6 +491,7 @@
         areaMonitor: 0,//是否订阅盘整区间监控 0：否 1：是
         volumeMonitor: 0,//是否启用量价分析 0：否 1：是
         monitorProfit: 1, //振幅限制 
+        tradeNumberMonitor: 60,//活跃度限制
     });
 
     const openSettingForm = () => {
@@ -530,6 +534,7 @@
             settingForm.areaMonitor = result.areaMonitor;
             settingForm.volumeMonitor = result.volumeMonitor;
             settingForm.monitorProfit = result.monitorProfit;
+            settingForm.tradeNumberMonitor = result.tradeNumberMonitor;
             hmacForm.autoTrade = result.autoTrade;
             hmacForm.autoTradeType = result.autoTradeType;
             hmacForm.binanceApiKey = result.binanceApiKey;
