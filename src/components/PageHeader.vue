@@ -112,6 +112,12 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
+            <el-form-item label="突破交易" :label-width="settingLabelWidth" v-if="settingForm.emaMonitor == 1">
+                <el-radio-group v-model="settingForm.breakthroughMonitor" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
             <el-form-item label="指数均线" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.emaRiseAndFall" size="small">
                     <el-radio-button label="开启" :value="1" />
@@ -216,6 +222,12 @@
             </el-form-item>
             <el-form-item v-if="hmacForm.autoTradeType == 0 || hmacForm.autoTradeType == 3" label="回踩交易" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.tradeStepBack" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item v-if="hmacForm.autoTradeType == 1" label="突破交易" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.breakthroughTrade" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
@@ -409,6 +421,7 @@
         countertrendTrading: 0,
         fibLevel: 0,
         tradeNumber: 60,
+        breakthroughTrade: 0,
     })
 
     const changeApiSetting = ()=>{
@@ -492,6 +505,7 @@
         volumeMonitor: 0,//是否启用量价分析 0：否 1：是
         monitorProfit: 1, //振幅限制 
         tradeNumberMonitor: 60,//活跃度限制
+        breakthroughMonitor: 0, //是否监控突破行为 价格行为监控使用 0：否 1：是
     });
 
     const openSettingForm = () => {
@@ -535,6 +549,7 @@
             settingForm.volumeMonitor = result.volumeMonitor;
             settingForm.monitorProfit = result.monitorProfit;
             settingForm.tradeNumberMonitor = result.tradeNumberMonitor;
+            settingForm.breakthroughMonitor = result.breakthroughMonitor;
             hmacForm.autoTrade = result.autoTrade;
             hmacForm.autoTradeType = result.autoTradeType;
             hmacForm.binanceApiKey = result.binanceApiKey;
@@ -554,6 +569,7 @@
             hmacForm.countertrendTrading = result.countertrendTrading;
             hmacForm.fibLevel = result.fibLevel;
             hmacForm.tradeNumber = result.tradeNumber;
+            hmacForm.breakthroughTrade = result.breakthroughTrade;
             emailForm.smtpHost = result.smtpHost;
             emailForm.smtpPort = new String(result.smtpPort);
             emailForm.smtpUser = result.smtpUser;
