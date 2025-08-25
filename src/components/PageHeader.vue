@@ -184,6 +184,12 @@
             <el-form-item label="止损比例" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.cutLoss" :step="0.1" :min="1.0" :max="10.0" show-input />
             </el-form-item>
+            <el-form-item label="追踪回调" :label-width="hmacFormLabelWidth" v-if="hmacForm.callbackRateEnabled == 1">
+                <el-slider v-model="hmacForm.callbackRate" :step="0.1" :min="1.0" :max="10.0" show-input />
+            </el-form-item>
+            <el-form-item label="追踪比例" :label-width="hmacFormLabelWidth" v-if="hmacForm.callbackRateEnabled == 1">
+                <el-slider v-model="hmacForm.activationPriceRatio" :step="0.1" :min="1.0" :max="10.0" show-input />
+            </el-form-item>
             <el-form-item label="获利预期" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.6" :max="10.0" show-input />
             </el-form-item>
@@ -210,6 +216,12 @@
             </el-form-item>
             <el-form-item label="自动交易" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.autoTrade" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="追踪止损" :label-width="hmacFormLabelWidth">
+                <el-radio-group v-model="hmacForm.callbackRateEnabled" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
@@ -422,6 +434,9 @@
         fibLevel: 0,
         tradeNumber: 60,
         breakthroughTrade: 0,
+        callbackRate: 3,
+        activationPriceRatio: 3,
+        callbackRateEnabled: 0,
     })
 
     const changeApiSetting = ()=>{
@@ -570,6 +585,9 @@
             hmacForm.fibLevel = result.fibLevel;
             hmacForm.tradeNumber = result.tradeNumber;
             hmacForm.breakthroughTrade = result.breakthroughTrade;
+            hmacForm.callbackRate = result.callbackRate;
+            hmacForm.callbackRateEnabled = result.callbackRateEnabled;
+            hmacForm.activationPriceRatio = result.activationPriceRatio;
             emailForm.smtpHost = result.smtpHost;
             emailForm.smtpPort = new String(result.smtpPort);
             emailForm.smtpUser = result.smtpUser;
