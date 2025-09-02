@@ -184,12 +184,6 @@
             <el-form-item label="止损比例" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.cutLoss" :step="0.1" :min="1.0" :max="10.0" show-input />
             </el-form-item>
-            <el-form-item label="追踪回调" :label-width="hmacFormLabelWidth" v-if="hmacForm.callbackRateEnabled == 1">
-                <el-slider v-model="hmacForm.callbackRate" :step="0.1" :min="1.0" :max="10.0" show-input />
-            </el-form-item>
-            <el-form-item label="追踪比例" :label-width="hmacFormLabelWidth" v-if="hmacForm.callbackRateEnabled == 1">
-                <el-slider v-model="hmacForm.activationPriceRatio" :step="0.1" :min="1.0" :max="10.0" show-input />
-            </el-form-item>
             <el-form-item label="获利预期" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.6" :max="10.0" show-input />
             </el-form-item>
@@ -220,11 +214,17 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="追踪止损" :label-width="hmacFormLabelWidth">
+            <el-form-item label="跟踪委托" :label-width="hmacFormLabelWidth">
                 <el-radio-group v-model="hmacForm.callbackRateEnabled" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
+            </el-form-item>
+            <el-form-item label="回调幅度" :label-width="hmacFormLabelWidth" v-if="hmacForm.callbackRateEnabled == 1">
+                <el-slider v-model="hmacForm.callbackRate" :step="0.1" :min="1.0" :max="10.0" show-input />
+            </el-form-item>
+            <el-form-item label="激活幅度" :label-width="hmacFormLabelWidth" v-if="hmacForm.callbackRateEnabled == 1">
+                <el-slider v-model="hmacForm.activationPriceRatio" :step="0.1" :min="1.0" :max="10.0" show-input />
             </el-form-item>
             <el-form-item label="画线交易" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.drawTrade" size="small">
