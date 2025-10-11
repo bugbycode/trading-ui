@@ -142,6 +142,22 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
+            <el-form-item label="币种过滤" :label-width="settingLabelWidth" >
+                <el-select 
+                    v-model="pairPolicySelected"
+                    multiple
+                    placeholder="请选择交易对"
+                    filterable
+                    clearable
+                >
+                <el-option
+                    v-for="item in pairPolicyOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                />
+                </el-select>
+            </el-form-item>
             <el-form-item label="振幅过滤" :label-width="settingLabelWidth" >
                 <el-slider v-model="settingForm.monitorProfit" :step="0.1" :min="1" :max="10.0" show-input />
             </el-form-item>
@@ -318,6 +334,7 @@
     }
 
     import axios from './../axios'
+    import axios_ from 'axios';
 
     const emit = defineEmits();
 
@@ -335,6 +352,28 @@
             router.push('/login');
         })
     }
+
+    // 币种过滤选项 ========================= START
+    const baseHttpUrl = 'https://fapi.binance.com';
+    var pairPolicySelected = ref([]);
+    var pairPolicyOptions = ref([]);
+    //获取币安合约所有交易对
+    axios_.get(baseHttpUrl + '/fapi/v1/exchangeInfo').then(function(result){
+        var symbols = result.data.symbols;
+        for(var index = 0;index < symbols.length;index++){
+            if(symbols[index].contractType == 'PERPETUAL' && symbols[index].status == 'TRADING'){
+                pairPolicyOptions.value.push({
+                    label: symbols[index].symbol,
+                    value: symbols[index].symbol,
+                });
+            }
+        }
+        //console.log(pairPolicyOptions);
+    }).catch(function(e){
+        console.error(e);
+    });
+
+    // 币种过滤选项 ========================= END
 
     //邮箱认证start
     const dialogEmailFormVisible = ref(false);
@@ -521,6 +560,7 @@
         monitorProfit: 1, //振幅限制 
         tradeNumberMonitor: 60,//活跃度限制
         breakthroughMonitor: 0, //是否监控突破行为 价格行为监控使用 0：否 1：是
+        pairPolicySelected: pairPolicySelected,//交易对过滤
     });
 
     const openSettingForm = () => {
@@ -565,6 +605,7 @@
             settingForm.monitorProfit = result.monitorProfit;
             settingForm.tradeNumberMonitor = result.tradeNumberMonitor;
             settingForm.breakthroughMonitor = result.breakthroughMonitor;
+            settingForm.pairPolicySelected = result.pairPolicySelected;
             hmacForm.autoTrade = result.autoTrade;
             hmacForm.autoTradeType = result.autoTradeType;
             hmacForm.binanceApiKey = result.binanceApiKey;
