@@ -177,7 +177,7 @@
     <!--修改用户信息表单END-->
 
     <!--修改Hmac Sha256信息表单 START -->
-    <el-dialog v-model="dialogHmacFormVisible" title="币安HMAC配置" width="600">
+    <el-dialog v-model="dialogHmacFormVisible" title="币安HMAC配置" width="600" top="5vh">
         <el-form :model="settingForm">
             <el-form-item label="公钥信息" :label-width="hmacFormLabelWidth" >
                 <el-input v-model="hmacForm.binanceApiKey" clearable/>
