@@ -142,9 +142,15 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="币种过滤" :label-width="settingLabelWidth" >
+            <el-form-item label="筛选策略" :label-width="settingLabelWidth" >
+                <el-radio-group v-model="settingForm.monitorPolicyType" size="small">
+                    <el-radio-button label="白名单" :value="1" />
+                    <el-radio-button label="黑名单" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="币种筛选" :label-width="settingLabelWidth" >
                 <el-select 
-                    v-model="pairPolicySelected"
+                    v-model="settingForm.pairPolicySelected"
                     multiple
                     placeholder="请选择交易对"
                     filterable
@@ -177,7 +183,7 @@
     <!--修改用户信息表单END-->
 
     <!--修改Hmac Sha256信息表单 START -->
-    <el-dialog v-model="dialogHmacFormVisible" title="币安HMAC配置" width="600" top="5vh">
+    <el-dialog v-model="dialogHmacFormVisible" title="币安HMAC配置" width="600" top="1vh">
         <el-form :model="settingForm">
             <el-form-item label="公钥信息" :label-width="hmacFormLabelWidth" >
                 <el-input v-model="hmacForm.binanceApiKey" clearable/>
@@ -287,6 +293,28 @@
             <el-form-item label="PNL阈值" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.recvCrossUnPnlPercent" :step="0.1" :min="0.0" :max="100.0" show-input />
             </el-form-item>-->
+            <el-form-item label="筛选策略" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.tradePolicyType" size="small">
+                    <el-radio-button label="白名单" :value="1" />
+                    <el-radio-button label="黑名单" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="币种筛选" :label-width="hmacFormLabelWidth" >
+                <el-select 
+                    v-model="hmacForm.tradePairPolicySelected"
+                    multiple
+                    placeholder="请选择交易对"
+                    filterable
+                    clearable
+                >
+                <el-option
+                    v-for="item in pairPolicyOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                />
+                </el-select>
+            </el-form-item>
             <el-form-item label="密码验证" :label-width="hmacFormLabelWidth" >
                 <el-input v-model="hmacForm.password" show-password clearable/>
             </el-form-item>
@@ -355,7 +383,6 @@
 
     // 币种过滤选项 ========================= START
     const baseHttpUrl = 'https://fapi.binance.com';
-    var pairPolicySelected = ref([]);
     var pairPolicyOptions = ref([]);
     //获取币安合约所有交易对
     axios_.get(baseHttpUrl + '/fapi/v1/exchangeInfo').then(function(result){
@@ -476,6 +503,8 @@
         callbackRate: 3,
         activationPriceRatio: 3,
         callbackRateEnabled: 0,
+        tradePairPolicySelected:[],
+        tradePolicyType: 0,
     })
 
     const changeApiSetting = ()=>{
@@ -560,12 +589,14 @@
         monitorProfit: 1, //振幅限制 
         tradeNumberMonitor: 60,//活跃度限制
         breakthroughMonitor: 0, //是否监控突破行为 价格行为监控使用 0：否 1：是
-        pairPolicySelected: pairPolicySelected,//交易对过滤
+        pairPolicySelected: [],//交易对过滤
+        monitorPolicyType: 0,//监控策略类型（1:白名单/0:黑名单）
     });
 
     const openSettingForm = () => {
-        dialogSettingFormVisible.value = true;
         checkOnline();
+        dialogSettingFormVisible.value = true;
+        getUserInfo();
     }
 
     const changeSetting = () => {
@@ -595,6 +626,7 @@
     const getUserInfo = () =>{
         axios.get('/user/userInfo').then(function(result){
             username.value = result.username;
+            
             settingForm.emaMonitor = result.emaMonitor;
             settingForm.emaRiseAndFall = result.emaRiseAndFall;
             settingForm.fibMonitor = result.fibMonitor;
@@ -606,6 +638,8 @@
             settingForm.tradeNumberMonitor = result.tradeNumberMonitor;
             settingForm.breakthroughMonitor = result.breakthroughMonitor;
             settingForm.pairPolicySelected = result.pairPolicySelected;
+            settingForm.monitorPolicyType = result.monitorPolicyType;
+
             hmacForm.autoTrade = result.autoTrade;
             hmacForm.autoTradeType = result.autoTradeType;
             hmacForm.binanceApiKey = result.binanceApiKey;
@@ -629,6 +663,9 @@
             hmacForm.callbackRate = result.callbackRate;
             hmacForm.callbackRateEnabled = result.callbackRateEnabled;
             hmacForm.activationPriceRatio = result.activationPriceRatio;
+            hmacForm.tradePairPolicySelected = result.tradePairPolicySelected;
+            hmacForm.tradePolicyType = result.tradePolicyType;
+
             emailForm.smtpHost = result.smtpHost;
             emailForm.smtpPort = new String(result.smtpPort);
             emailForm.smtpUser = result.smtpUser;
