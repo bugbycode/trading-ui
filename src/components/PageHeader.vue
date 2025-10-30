@@ -92,7 +92,7 @@
     <!--修改密码表单END-->
 
     <!--修改用户信息表单START-->
-    <el-dialog v-model="dialogSettingFormVisible" title="行情监控" width="500">
+    <el-dialog v-model="dialogSettingFormVisible" title="行情监控" width="600">
         <el-form :model="settingForm">
             <el-form-item label="价格回撤" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.fibMonitor" size="small">
@@ -163,6 +163,16 @@
                     :value="item.value"
                 />
                 </el-select>
+            </el-form-item>
+            <el-form-item v-if="settingForm.fibMonitor == 1" label="回撤比例" :label-width="settingLabelWidth" >
+                <el-radio-group v-model="settingForm.monitorfibLevel" size="small">
+                    <el-radio-button label="Lv0(0.236)" :value="0" />
+                    <el-radio-button label="Lv1(0.382)" :value="1" />
+                    <el-radio-button label="Lv2(0.5)" :value="2" />
+                    <el-radio-button label="Lv3(0.618)" :value="3" />
+                    <el-radio-button label="Lv4(0.786)" :value="4" />
+                    <el-radio-button label="Lv5(1.0)" :value="5" />
+                </el-radio-group>
             </el-form-item>
             <el-form-item label="振幅过滤" :label-width="settingLabelWidth" >
                 <el-slider v-model="settingForm.monitorProfit" :step="0.1" :min="1" :max="10.0" show-input />
@@ -577,7 +587,7 @@
     //设置用户信息表单start ==================
 
     var dialogSettingFormVisible = ref(false);
-    const settingLabelWidth = '125px'
+    const settingLabelWidth = '100px'
     var settingForm = reactive({
         fibMonitor: 0,//是否订阅斐波那契回撤监控 0：否 1：是
         riseAndFallMonitor: 0,//是否订阅涨跌幅监控 0：否 1：是
@@ -591,6 +601,7 @@
         breakthroughMonitor: 0, //是否监控突破行为 价格行为监控使用 0：否 1：是
         pairPolicySelected: [],//交易对过滤
         monitorPolicyType: 0,//监控策略类型（1:白名单/0:黑名单）
+        monitorfibLevel: 0, //价格回撤级别（行情监控使用）
     });
 
     const openSettingForm = () => {
@@ -639,6 +650,7 @@
             settingForm.breakthroughMonitor = result.breakthroughMonitor;
             settingForm.pairPolicySelected = result.pairPolicySelected;
             settingForm.monitorPolicyType = result.monitorPolicyType;
+            settingForm.monitorfibLevel = result.monitorfibLevel;
 
             hmacForm.autoTrade = result.autoTrade;
             hmacForm.autoTradeType = result.autoTradeType;
