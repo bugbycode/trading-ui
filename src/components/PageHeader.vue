@@ -15,6 +15,7 @@
         <el-col :span="8">
             <ul class="userIcon">
                 <el-text class="userInfo">
+                    <el-icon class="handStyle usernameStyle" @click="showAllChildCfg"><Stamp /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="showAllShape"><AlarmClock /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="showBalance"><Wallet /></el-icon>
                     <el-icon class="handStyle usernameStyle" @click="openSettingForm"><Setting /></el-icon>
@@ -357,6 +358,92 @@
     </el-dialog>
     <!--余额信息END-->
 
+    <!-- 子账号信息管理列表 START -->
+    <el-dialog v-model="child_cfg_table_visible" title="子账号信息管理">
+		<div>
+			<el-input
+				v-model="child_cfg_table_data.keyword"
+				style="width: 240px"
+				placeholder="请输入要查询的信息"
+				@keyup.enter="searchChildCfg"
+			>
+			<template #prefix>
+				<el-icon class="el-input__icon"><search /></el-icon>
+			</template>
+			</el-input>
+            <!--<el-icon class="handStyle float_right usernameStyle" size="20"><Delete /></el-icon>-->
+            <el-icon @click="showChildCfgDialog" class="handStyle float_right usernameStyle" size="20"><Plus /></el-icon>
+		</div>
+		<el-table :data="child_cfg_table_data.data" stripe  style="width: 100%" empty-text="无数据">
+			<el-table-column type="selection" width="50" />
+			<el-table-column label="邮箱账号">
+				<template #default="scope">{{ maskEmail(scope.row.email) }}</template>
+			</el-table-column>
+			<el-table-column label="API key">
+				<template #default="scope">{{ maskKey(scope.row.binanceApiKey) }}</template>
+			</el-table-column>
+			<el-table-column label="创建时间">
+				<template #default="scope">{{ scope.row.formatCreateTime }}</template>
+			</el-table-column>
+			<el-table-column label="修改时间">
+				<template #default="scope">{{ scope.row.formatUpdateTime }}</template>
+			</el-table-column>
+			<el-table-column label="操作" width="100">
+				<template #default="scope">
+                   <el-icon @click="showEditChildCfgDialog(scope.row.id, scope.row.email, scope.row.binanceApiKey, scope.row.binanceSecretKey)" class="handStyle"><Edit /></el-icon>&nbsp;
+                   <el-icon @click="removeChildCfg( scope.row.id )" class="handStyle"><Delete /></el-icon>
+				</template>
+			</el-table-column>
+		</el-table>
+		<div>&nbsp;</div>
+		<div>
+			<el-pagination
+				v-model:current-page="child_cfg_table_data.currentPage"
+				v-model:page-size="child_cfg_table_data.limit"
+				:page-sizes="[5,10,15,20]"
+				:size="child_cfg_table_data.limit"
+				:disabled="false"
+				:background="true"
+				layout="total, sizes, prev, pager, next, jumper"
+				:total="child_cfg_table_data.totalCount"
+				@size-change="queryChildCfg"
+				@current-change="currentChange"
+			>
+			</el-pagination>
+		</div>
+		<template #footer>
+			<div class="dialog-footer">
+				<!--<el-button @click="horizontal_ray_form_visible = false">关闭</el-button>-->
+				<el-button type="primary" @click="child_cfg_table_visible = false">
+				关闭
+				</el-button>
+			</div>
+		</template>
+	</el-dialog>
+     <!-- 子账号信息管理列表 END -->
+    <!-- 子账号添加窗口 START -->
+     <el-dialog v-model="dialogChildCfgFormVisible" :title="childCfgDialogTitle" width="500">
+        <el-form :model="form">
+            <el-form-item label="邮箱账号" :label-width="childCfgLabelWidth" >
+                <el-input type="text" v-model="childCfgForm.email" placeholder="请输入邮箱账号" autocomplete="off" clearable/>
+            </el-form-item>
+            <el-form-item label="API key" :label-width="childCfgLabelWidth">
+                <el-input type="text" v-model="childCfgForm.binanceApiKey" placeholder="请输入API key" autocomplete="off" clearable/>
+            </el-form-item>
+            <el-form-item label="Secret Key" :label-width="childCfgLabelWidth">
+                <el-input type="password" v-model="childCfgForm.binanceSecretKey" placeholder="请输入Secret Key" autocomplete="off" show-password clearable/>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+        <div class="dialog-footer">
+            <el-button @click="dialogChildCfgFormVisible = false">取消</el-button>
+            <el-button type="primary" @click="changeChildCfg">
+                确认
+            </el-button>
+        </div>
+        </template>
+    </el-dialog>
+    <!-- 子账号添加窗口 END -->
 </template>
 <script lang="ts" setup>
     import { ElMessageBox, ElMessage } from 'element-plus'
@@ -390,6 +477,118 @@
             router.push('/login');
         })
     }
+
+    //子账号列表 ========================== START
+
+    const childCfgLabelWidth = '100px'
+    const childCfgDialogTitle = ref('添加子账号')
+    const child_cfg_table_data = reactive({
+        data: [],
+        startIndex: 0,
+        currentPage: 1,
+        limit: 10,
+        keyword: '',
+        totalCount: 0,
+        pageCount: 0,
+    })
+    const child_cfg_table_visible = ref(false);
+    const dialogChildCfgFormVisible = ref(false);
+    const queryChildCfg = () => {
+        axios.get("/childApiKey/query?keyword=" +  child_cfg_table_data.keyword + 
+        "&startIndex=" + child_cfg_table_data.startIndex + "&limit=" + child_cfg_table_data.limit).then(function(result){
+            child_cfg_table_data.data = result.list;
+            child_cfg_table_data.startIndex = result.page.startIndex;
+            child_cfg_table_data.pageCount = result.page.pageCount;
+            child_cfg_table_data.currentPage = result.page.currentPage;
+            child_cfg_table_data.totalCount = result.page.totalCount;
+            child_cfg_table_data.limit = result.page.limit;
+            child_cfg_table_visible.value = true;
+        }).catch(function(err){
+            ElMessage.error({message: err.message, offset: (window.innerHeight / 2) - 50});
+        });
+    }
+
+    const currentChange = ()=>{
+        child_cfg_table_data.startIndex = child_cfg_table_data.currentPage * child_cfg_table_data.limit - child_cfg_table_data.limit;
+        queryChildCfg();
+    }
+
+    const searchChildCfg = () => {
+        child_cfg_table_data.startIndex = 0;
+        queryChildCfg();
+    }
+
+    const showAllChildCfg = ()=> {
+        queryChildCfg();
+    }
+
+    var childCfgForm = reactive({
+        id:'',
+        email: '',
+        binanceApiKey: '',
+        binanceSecretKey: '',
+    });
+
+    const changeChildCfg = ()=> {
+        axios.post('/childApiKey/saveChildCfg',childCfgForm).then(function(result){
+            if(result.code == 1){
+                ElMessage.error({message: result.message, offset: (window.innerHeight / 2)});
+            } else if(result.code == 0){
+                ElMessage.success({message: result.message, offset: (window.innerHeight / 2)});
+                dialogChildCfgFormVisible.value = false;
+                queryChildCfg();
+            }
+            checkOnline();
+        }).catch(function(err){
+            checkOnline();
+        })
+    }
+
+    const showChildCfgDialog = () => {
+        childCfgDialogTitle.value = '添加子账号'
+        childCfgForm.id = '';
+        childCfgForm.email = '';
+        childCfgForm.binanceApiKey = '';
+        childCfgForm.binanceSecretKey = '';
+        dialogChildCfgFormVisible.value = true;
+    }
+
+    const showEditChildCfgDialog = (id, email, binanceApiKey, binanceSecretKey) => {
+        childCfgDialogTitle.value = '修改子账号'
+        childCfgForm.id = id;
+        childCfgForm.email = email;
+        childCfgForm.binanceApiKey = binanceApiKey;
+        childCfgForm.binanceSecretKey = binanceSecretKey;
+        dialogChildCfgFormVisible.value = true;
+    }
+
+    var removeChildCfg = (id) => {
+        ElMessageBox.confirm( '确定要删除子账号信息吗？', '温馨提示',
+            {
+                confirmButtonText: '确认',
+                cancelButtonText: '取消',
+                type: 'warning',
+            }
+        ).then(() => {
+            axios.post('/childApiKey/removeChildCfg/' + id).then(function(result){
+                if(result.code == 1){
+                    ElMessage.error({message: result.message, offset: (window.innerHeight / 2)});
+                } else if(result.code == 0){
+                    ElMessage.success({message: result.message, offset: (window.innerHeight / 2)});
+                    queryChildCfg();
+                }
+                checkOnline();
+            }).catch(function(err){
+                console.log(err);
+                checkOnline();
+            });
+        }).catch(() => {
+            
+        })
+    }
+
+    //子账号列表 ========================== END
+
 
     // 币种过滤选项 ========================= START
     const baseHttpUrl = 'https://fapi.binance.com';
@@ -716,6 +915,11 @@
       return `${username.slice(0, 3)}***@${domain}`;
     }
 
+    const maskKey = (key) => {
+      //const [username, domain] = key.split('@');
+      return `${key.slice(0, 4)}***${key.slice(key.length - 4, key.length)}`;
+    }
+
     const botPnl = () => {
         axios.get('/bot/getOrderCount').then(function(data){
             //console.log(data)
@@ -748,5 +952,8 @@
 }
 .usernameStyle{
     margin: 0px 5px;
+}
+.float_right {
+    float: right;
 }
 </style>
