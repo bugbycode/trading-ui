@@ -211,6 +211,9 @@
             <el-form-item label="杠杆倍数" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.leverage" :min="2" :max="10" show-input />
             </el-form-item>
+            <el-form-item label="仓位数量" :label-width="hmacFormLabelWidth" >
+                <el-slider v-model="hmacForm.positionCountLimit" :min="1" :max="positionCountLimitMax" show-input />
+            </el-form-item>
             <el-form-item label="持仓价值" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.positionValue" :min="50" :max="1000" show-input />
             </el-form-item>
@@ -685,6 +688,7 @@
         1000: '1000',
     })
 
+    const positionCountLimitMax = ref(1000);
     const dialogHmacFormVisible = ref(false);
     const hmacFormLabelWidth = '100px';
     var hmacForm = reactive({
@@ -714,6 +718,7 @@
         callbackRateEnabled: 0,
         tradePairPolicySelected:[],
         tradePolicyType: 0,
+        positionCountLimit: 100,
     })
 
     const changeApiSetting = ()=>{
@@ -876,6 +881,7 @@
             hmacForm.activationPriceRatio = result.activationPriceRatio;
             hmacForm.tradePairPolicySelected = result.tradePairPolicySelected;
             hmacForm.tradePolicyType = result.tradePolicyType;
+            hmacForm.positionCountLimit = result.positionCountLimit;
 
             emailForm.smtpHost = result.smtpHost;
             emailForm.smtpPort = new String(result.smtpPort);
@@ -929,6 +935,19 @@
             console.error(err);
         })
     }
+
+    //交易对及交易规则
+    const exchangeInfo = () => {
+        //获取币安合约所有交易对
+        axios_.get(baseHttpUrl + '/fapi/v1/exchangeInfo').then(function(result){
+            if(result && result.status == 200){
+                var symbols = result.data.symbols;
+                positionCountLimitMax.value = symbols.length * 2;
+            }
+        });
+    }
+
+    exchangeInfo();
 </script>
 <style scoped>
 
