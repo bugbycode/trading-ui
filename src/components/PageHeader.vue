@@ -176,7 +176,7 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="振幅过滤" :label-width="settingLabelWidth" >
-                <el-slider v-model="settingForm.monitorProfit" :step="0.1" :min="1" :max="10.0" show-input />
+                <el-slider v-model="settingForm.monitorProfit" :step="0.1" :min="0.5" :max="10.0" show-input />
             </el-form-item>
             <el-form-item label="热度过滤" :label-width="settingLabelWidth" >
                 <el-slider v-model="settingForm.tradeNumberMonitor" :step="1" :min="1" :max="1000" :marks="marksTradeNumber" show-input />
@@ -221,7 +221,7 @@
                 <el-slider v-model="hmacForm.cutLoss" :step="0.1" :min="1.0" :max="10.0" show-input />
             </el-form-item>
             <el-form-item label="获利预期" :label-width="hmacFormLabelWidth" >
-                <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.6" :max="10.0" show-input />
+                <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.5" :max="10.0" show-input />
             </el-form-item>
             <el-form-item v-if="hmacForm.tradeStyle == 0" label="止盈限制" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.profitLimit" :step="0.1" :min="0.1" :max="100.0" show-input />
