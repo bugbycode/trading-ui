@@ -112,13 +112,13 @@
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
-            </el-form-item>
+            </el-form-item>-->
             <el-form-item label="突破交易" :label-width="settingLabelWidth" v-if="settingForm.emaMonitor == 1">
                 <el-radio-group v-model="settingForm.breakthroughMonitor" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
-            </el-form-item>-->
+            </el-form-item>
             <!--<el-form-item label="指数均线" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.emaRiseAndFall" size="small">
                     <el-radio-button label="开启" :value="1" />
@@ -229,8 +229,8 @@
             <el-form-item label="交易指标" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.autoTradeType" size="small">
                     <!--<el-radio-button label="盘整区间" :value="3" />
-                    <el-radio-button label="指数均线" :value="2" />
-                    <el-radio-button label="价格行为" :value="1" />-->
+                    <el-radio-button label="指数均线" :value="2" />-->
+                    <el-radio-button label="价格行为" :value="1" />
                     <el-radio-button label="价格回撤" :value="0"/>
                 </el-radio-group>
             </el-form-item>
