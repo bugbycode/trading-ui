@@ -252,7 +252,7 @@ export default {
                 coinInfoMap = {};
                 var symbols = result.data.symbols;
                 for(var index = 0;index < symbols.length;index++){
-                    if(symbols[index].contractType == 'PERPETUAL' && symbols[index].status == 'TRADING' || symbols[index].contractType == 'CURRENT_QUARTER' || symbols[index].contractType == 'NEXT_QUARTER'){
+                    if((symbols[index].contractType == 'PERPETUAL' || symbols[index].contractType == 'TRADIFI_PERPETUAL' || symbols[index].contractType == 'CURRENT_QUARTER' || symbols[index].contractType == 'NEXT_QUARTER') && symbols[index].status == 'TRADING'){
                         coinInfo.push(symbols[index].symbol)
                         var symbol = symbols[index].symbol;
                         var pair = symbols[index].pair;

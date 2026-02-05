@@ -600,7 +600,7 @@
     axios_.get(baseHttpUrl + '/fapi/v1/exchangeInfo').then(function(result){
         var symbols = result.data.symbols;
         for(var index = 0;index < symbols.length;index++){
-            if(symbols[index].contractType == 'PERPETUAL' && symbols[index].status == 'TRADING'){
+            if((symbols[index].contractType == 'PERPETUAL' || symbols[index].contractType == 'TRADIFI_PERPETUAL') && symbols[index].status == 'TRADING'){
                 pairPolicyOptions.value.push({
                     label: symbols[index].symbol,
                     value: symbols[index].symbol,
