@@ -137,6 +137,12 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
+            <el-form-item label="期权交易" :label-width="settingLabelWidth" >
+                <el-radio-group v-model="settingForm.eoptionsStatus" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
             <!--<el-form-item label="量价监控" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.volumeMonitor" size="small">
                     <el-radio-button label="开启" :value="1" />
@@ -806,6 +812,7 @@
         pairPolicySelected: [],//交易对过滤
         monitorPolicyType: 0,//监控策略类型（1:白名单/0:黑名单）
         monitorfibLevel: 0, //价格回撤级别（行情监控使用）
+        eoptionsStatus: 0, //期权交易机会监控  0：否 1：是
     });
 
     const openSettingForm = () => {
@@ -855,6 +862,7 @@
             settingForm.pairPolicySelected = result.pairPolicySelected;
             settingForm.monitorPolicyType = result.monitorPolicyType;
             settingForm.monitorfibLevel = result.monitorfibLevel;
+            settingForm.eoptionsStatus = result.eoptionsStatus;
 
             hmacForm.autoTrade = result.autoTrade;
             hmacForm.autoTradeType = result.autoTradeType;
