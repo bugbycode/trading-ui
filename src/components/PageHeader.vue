@@ -95,13 +95,13 @@
     <!--修改用户信息表单START-->
     <el-dialog v-model="dialogSettingFormVisible" title="行情监控" width="600">
         <el-form :model="settingForm">
-            <!--<el-form-item label="价格回撤" :label-width="settingLabelWidth" >
+            <el-form-item label="价格回撤" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.fibMonitor" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="行情波动" :label-width="settingLabelWidth" >
+            <!--<el-form-item label="行情波动" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.riseAndFallMonitor" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
@@ -171,7 +171,7 @@
                 />
                 </el-select>
             </el-form-item>
-            <!--<el-form-item v-if="settingForm.fibMonitor == 1" label="回撤比例" :label-width="settingLabelWidth" >
+            <el-form-item v-if="settingForm.fibMonitor == 1" label="回撤比例" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.monitorfibLevel" size="small">
                     <el-radio-button label="Lv0(0.236)" :value="0" />
                     <el-radio-button label="Lv1(0.382)" :value="1" />
@@ -180,7 +180,7 @@
                     <el-radio-button label="Lv4(0.786)" :value="4" />
                     <el-radio-button label="Lv5(1.0)" :value="5" />
                 </el-radio-group>
-            </el-form-item>-->
+            </el-form-item>
             <el-form-item label="振幅过滤" :label-width="settingLabelWidth" >
                 <el-slider v-model="settingForm.monitorProfit" :step="0.1" :min="0.5" :max="10.0" show-input />
             </el-form-item>
@@ -229,18 +229,15 @@
             <el-form-item label="获利预期" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.5" :max="10.0" show-input />
             </el-form-item>
-            <el-form-item v-if="hmacForm.tradeStyle == 0" label="止盈限制" :label-width="hmacFormLabelWidth" >
-                <el-slider v-model="hmacForm.profitLimit" :step="0.1" :min="0.1" :max="100.0" show-input />
-            </el-form-item>
-            <!--<el-form-item label="交易指标" :label-width="hmacFormLabelWidth" >
+            <el-form-item label="交易指标" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.autoTradeType" size="small">
-                    <el-radio-button label="盘整区间" :value="3" />
-                    <el-radio-button label="指数均线" :value="2" />
+                    <!--<el-radio-button label="盘整区间" :value="3" />
+                    <el-radio-button label="指数均线" :value="2" />-->
                     <el-radio-button label="价格行为" :value="1" />
                     <el-radio-button label="价格回撤" :value="0"/>
                 </el-radio-group>
-            </el-form-item>-->
-            <!--<el-form-item v-if="hmacForm.autoTradeType == 0" label="回撤比例" :label-width="hmacFormLabelWidth" >
+            </el-form-item>
+            <el-form-item v-if="hmacForm.autoTradeType == 0" label="回撤比例" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.fibLevel" size="small">
                     <el-radio-button label="Lv0(0.236)" :value="0" />
                     <el-radio-button label="Lv1(0.382)" :value="1" />
@@ -249,7 +246,7 @@
                     <el-radio-button label="Lv4(0.786)" :value="4" />
                     <el-radio-button label="Lv5(1.0)" :value="5" />
                 </el-radio-group>
-            </el-form-item>-->
+            </el-form-item>
             <el-form-item label="自动交易" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.autoTrade" size="small">
                     <el-radio-button label="开启" :value="1" />
@@ -274,13 +271,13 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <!--<el-form-item v-if="hmacForm.autoTradeType == 0" label="回踩交易" :label-width="hmacFormLabelWidth" >
+            <el-form-item v-if="hmacForm.autoTradeType == 0" label="回踩交易" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.tradeStepBack" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item v-if="hmacForm.autoTradeType == 1" label="突破交易" :label-width="hmacFormLabelWidth" >
+            <!--<el-form-item v-if="hmacForm.autoTradeType == 1" label="突破交易" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.breakthroughTrade" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
@@ -297,6 +294,9 @@
                     <el-radio-button label="激进" :value="1" />
                     <el-radio-button label="保守" :value="0"/>
                 </el-radio-group>
+            </el-form-item>
+            <el-form-item v-if="hmacForm.tradeStyle == 0" label="止盈限制" :label-width="hmacFormLabelWidth" >
+                <el-slider v-model="hmacForm.profitLimit" :step="0.1" :min="0.1" :max="100.0" show-input />
             </el-form-item>
             <el-form-item label="下单通知" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.recvTrade" size="small">
