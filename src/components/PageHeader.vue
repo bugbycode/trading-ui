@@ -95,13 +95,13 @@
     <!--修改用户信息表单START-->
     <el-dialog v-model="dialogSettingFormVisible" title="行情监控" width="600">
         <el-form :model="settingForm">
-            <el-form-item label="价格回撤" :label-width="settingLabelWidth" >
+            <!--<el-form-item label="价格回撤" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.fibMonitor" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <!--<el-form-item label="行情波动" :label-width="settingLabelWidth" >
+            <el-form-item label="行情波动" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.riseAndFallMonitor" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
