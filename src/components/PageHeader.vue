@@ -173,8 +173,8 @@
             </el-form-item>
             <el-form-item v-if="settingForm.fibMonitor == 1" label="回撤比例" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.monitorfibLevel" size="small">
-                    <el-radio-button label="Lv0(0.236)" :value="0" disabled />
-                    <el-radio-button label="Lv1(0.382)" :value="1" disabled />
+                    <el-radio-button label="Lv0(0.236)" :value="0" />
+                    <el-radio-button label="Lv1(0.382)" :value="1" />
                     <el-radio-button label="Lv2(0.5)" :value="2" />
                     <el-radio-button label="Lv3(0.618)" :value="3" />
                     <el-radio-button label="Lv4(0.786)" :value="4" />
@@ -239,8 +239,8 @@
             </el-form-item>
             <el-form-item v-if="hmacForm.autoTradeType == 0" label="回撤比例" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.fibLevel" size="small">
-                    <el-radio-button label="Lv0(0.236)" :value="0" disabled />
-                    <el-radio-button label="Lv1(0.382)" :value="1" disabled />
+                    <el-radio-button label="Lv0(0.236)" :value="0" />
+                    <el-radio-button label="Lv1(0.382)" :value="1" />
                     <el-radio-button label="Lv2(0.5)" :value="2" />
                     <el-radio-button label="Lv3(0.618)" :value="3" />
                     <el-radio-button label="Lv4(0.786)" :value="4" />
