@@ -113,13 +113,13 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <!--<el-form-item label="突破交易" :label-width="settingLabelWidth" v-if="settingForm.emaMonitor == 1">
+            <el-form-item label="突破交易" :label-width="settingLabelWidth" v-if="settingForm.emaMonitor == 1">
                 <el-radio-group v-model="settingForm.breakthroughMonitor" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="指数均线" :label-width="settingLabelWidth" >
+            <!--<el-form-item label="指数均线" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.emaRiseAndFall" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
@@ -277,13 +277,13 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <!--<el-form-item v-if="hmacForm.autoTradeType == 1" label="突破交易" :label-width="hmacFormLabelWidth" >
+            <el-form-item v-if="hmacForm.autoTradeType == 1" label="突破交易" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.breakthroughTrade" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item v-if="hmacForm.autoTradeType == 0" label="逆势交易" :label-width="hmacFormLabelWidth" >
+            <!--<el-form-item v-if="hmacForm.autoTradeType == 0" label="逆势交易" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.countertrendTrading" size="small">
                     <el-radio-button label="开启" :value="1" />
                     <el-radio-button label="关闭" :value="0"/>
