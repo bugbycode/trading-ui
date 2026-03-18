@@ -391,6 +391,9 @@
 			<el-table-column label="API key">
 				<template #default="scope">{{ maskKey(scope.row.binanceApiKey) }}</template>
 			</el-table-column>
+			<el-table-column label="杠杆倍数">
+				<template #default="scope">{{ scope.row.leverage }}</template>
+			</el-table-column>
 			<el-table-column label="创建时间">
 				<template #default="scope">{{ scope.row.formatCreateTime }}</template>
 			</el-table-column>
@@ -399,7 +402,7 @@
 			</el-table-column>
 			<el-table-column label="操作" width="100">
 				<template #default="scope">
-                   <el-icon @click="showEditChildCfgDialog(scope.row.id, scope.row.email, scope.row.binanceApiKey, scope.row.binanceSecretKey)" class="handStyle"><Edit /></el-icon>&nbsp;
+                   <el-icon @click="showEditChildCfgDialog(scope.row.id, scope.row.email, scope.row.binanceApiKey, scope.row.binanceSecretKey, scope.row.leverage)" class="handStyle"><Edit /></el-icon>&nbsp;
                    <el-icon @click="removeChildCfg( scope.row.id )" class="handStyle"><Delete /></el-icon>
 				</template>
 			</el-table-column>
@@ -441,6 +444,9 @@
             </el-form-item>
             <el-form-item label="Secret Key" :label-width="childCfgLabelWidth">
                 <el-input type="password" v-model="childCfgForm.binanceSecretKey" placeholder="请输入Secret Key" autocomplete="off" show-password clearable/>
+            </el-form-item>
+            <el-form-item label="杠杆倍数" :label-width="childCfgLabelWidth" >
+                <el-slider v-model="childCfgForm.leverage" :min="2" :max="5" show-input />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -536,6 +542,9 @@
         email: '',
         binanceApiKey: '',
         binanceSecretKey: '',
+        leverage: 0,
+        updateTime: 0,
+        createTime: 0,
     });
 
     const changeChildCfg = ()=> {
@@ -559,15 +568,17 @@
         childCfgForm.email = '';
         childCfgForm.binanceApiKey = '';
         childCfgForm.binanceSecretKey = '';
+        childCfgForm.leverage = 5;
         dialogChildCfgFormVisible.value = true;
     }
 
-    const showEditChildCfgDialog = (id, email, binanceApiKey, binanceSecretKey) => {
+    const showEditChildCfgDialog = (id, email, binanceApiKey, binanceSecretKey, leverage) => {
         childCfgDialogTitle.value = '修改子账号'
         childCfgForm.id = id;
         childCfgForm.email = email;
         childCfgForm.binanceApiKey = binanceApiKey;
         childCfgForm.binanceSecretKey = binanceSecretKey;
+        childCfgForm.leverage = leverage;
         dialogChildCfgFormVisible.value = true;
     }
 
