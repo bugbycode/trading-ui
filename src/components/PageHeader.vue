@@ -999,7 +999,7 @@
     }
 
     //交易对及交易规则
-    const exchangeInfo = () => {
+    /*const exchangeInfo = () => {
         //获取币安合约所有交易对
         axios_.get(baseHttpUrl + '/fapi/v1/exchangeInfo').then(function(result){
             if(result && result.status == 200){
@@ -1009,7 +1009,7 @@
         });
     }
 
-    exchangeInfo();
+    exchangeInfo();*/
 </script>
 <style scoped>
 
