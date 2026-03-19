@@ -185,7 +185,14 @@
                 <el-slider v-model="settingForm.monitorProfit" :step="0.1" :min="0.5" :max="10.0" show-input />
             </el-form-item>
             <el-form-item label="热度过滤" :label-width="settingLabelWidth" >
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    :content="'筛选币种数量：' + countByTradeNumber(settingForm.tradeNumberMonitor)"
+                    placement="top-start"
+                >
                 <el-slider v-model="settingForm.tradeNumberMonitor" :step="1" :min="1" :max="1000" :marks="marksTradeNumber" show-input />
+                </el-tooltip>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -209,7 +216,14 @@
                 <el-input v-model="hmacForm.binanceSecretKey" show-password clearable/>
             </el-form-item>
             <el-form-item label="市场热度" :label-width="hmacFormLabelWidth" >
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    :content="'筛选币种数量：' + countByTradeNumber(hmacForm.tradeNumber)"
+                    placement="top-start"
+                >
                 <el-slider v-model="hmacForm.tradeNumber" :step="1" :min="1" :max="1000" :marks="marksTradeNumber" show-input />
+                </el-tooltip>
             </el-form-item>
             <el-form-item label="名义价值" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.baseStepSize" :min="1" :max="100" show-input />
@@ -492,6 +506,36 @@
             router.push('/login');
         })
     }
+
+    //交易对成交笔数信息 ====================== START
+
+    var openInterestHistData = [];
+    const queryOpenInterestHist = () => {
+        axios.get('/openInterestHist/query').then(function(result){
+            if(result) {
+                for(var index = 0; index < result.length; index++) {
+                    if(result[index].tradeNumber > 0) {
+                        openInterestHistData.push(result[index]);
+                    }
+                }
+            }
+            console.log(openInterestHistData);
+        })
+    }
+
+    queryOpenInterestHist();
+
+    const countByTradeNumber = (tradeNumber) => {
+        var total = 0;
+        for (var index = 0; index < openInterestHistData.length; index++) {
+            if(openInterestHistData[index].tradeNumber >= tradeNumber) {
+                total++;
+            }
+        }
+        return total;
+    }
+
+    //交易对成交笔数信息 ====================== END
 
     //子账号列表 ========================== START
 
