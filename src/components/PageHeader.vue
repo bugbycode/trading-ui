@@ -748,7 +748,7 @@
         1000: '1000',
     })
 
-    const positionCountLimitMax = ref(1000);
+    const positionCountLimitMax = ref(100);
     const dialogHmacFormVisible = ref(false);
     const hmacFormLabelWidth = '100px';
     var hmacForm = reactive({
