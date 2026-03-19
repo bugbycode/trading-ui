@@ -519,7 +519,6 @@
                     }
                 }
             }
-            console.log(openInterestHistData);
         })
     }
 
