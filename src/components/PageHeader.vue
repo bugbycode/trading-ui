@@ -194,6 +194,9 @@
                 <el-slider v-model="settingForm.tradeNumberMonitor" :step="1" :min="1" :max="1000" :marks="marksTradeNumber" show-input />
                 </el-tooltip>
             </el-form-item>
+            <el-form-item label="热度排名" :label-width="settingLabelWidth" >
+                <el-slider v-model="settingForm.tradeNumberIndexMonitor" :step="1" :min="0" :max="openInterestHistDataSize" show-input />
+            </el-form-item>
         </el-form>
         <template #footer>
         <div class="dialog-footer">
@@ -224,6 +227,9 @@
                 >
                 <el-slider v-model="hmacForm.tradeNumber" :step="1" :min="1" :max="1000" :marks="marksTradeNumber" show-input />
                 </el-tooltip>
+            </el-form-item>
+            <el-form-item label="热度排名" :label-width="hmacFormLabelWidth" >
+                <el-slider v-model="hmacForm.tradeNumberIndex" :step="1" :min="0" :max="openInterestHistDataSize" show-input />
             </el-form-item>
             <el-form-item label="名义价值" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.baseStepSize" :min="1" :max="100" show-input />
@@ -508,8 +514,8 @@
     }
 
     //交易对成交笔数信息 ====================== START
-
     var openInterestHistData = [];
+    var openInterestHistDataSize = ref(0);
     const queryOpenInterestHist = () => {
         axios.get('/openInterestHist/query').then(function(result){
             if(result) {
@@ -518,6 +524,7 @@
                         openInterestHistData.push(result[index]);
                     }
                 }
+                openInterestHistDataSize.value = countByTradeNumber(0);
             }
         })
     }
@@ -779,6 +786,7 @@
         tradePairPolicySelected:[],
         tradePolicyType: 0,
         positionCountLimit: 100,
+        tradeNumberIndex: 100,
     })
 
     const changeApiSetting = ()=>{
@@ -867,6 +875,7 @@
         monitorPolicyType: 0,//监控策略类型（1:白名单/0:黑名单）
         monitorfibLevel: 0, //价格回撤级别（行情监控使用）
         eoptionsStatus: 0, //期权交易机会监控  0：否 1：是
+        tradeNumberIndexMonitor: 100, //市场活跃度排名索引，值越小热度越高 行情监控
     });
 
     const openSettingForm = () => {
@@ -917,6 +926,7 @@
             settingForm.monitorPolicyType = result.monitorPolicyType;
             settingForm.monitorfibLevel = result.monitorfibLevel;
             settingForm.eoptionsStatus = result.eoptionsStatus;
+            settingForm.tradeNumberIndexMonitor = result.tradeNumberIndexMonitor;
 
             hmacForm.autoTrade = result.autoTrade;
             hmacForm.autoTradeType = result.autoTradeType;
@@ -944,6 +954,7 @@
             hmacForm.tradePairPolicySelected = result.tradePairPolicySelected;
             hmacForm.tradePolicyType = result.tradePolicyType;
             hmacForm.positionCountLimit = result.positionCountLimit;
+            hmacForm.tradeNumberIndex = result.tradeNumberIndex;
 
             emailForm.smtpHost = result.smtpHost;
             emailForm.smtpPort = new String(result.smtpPort);
