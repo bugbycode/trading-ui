@@ -235,7 +235,7 @@
                 <el-slider v-model="hmacForm.baseStepSize" :min="1" :max="100" show-input />
             </el-form-item>
             <el-form-item label="杠杆倍数" :label-width="hmacFormLabelWidth" >
-                <el-slider v-model="hmacForm.leverage" :min="2" :max="10" show-input />
+                <el-slider v-model="hmacForm.leverage" :min="2" :max="150" show-input />
             </el-form-item>
             <el-form-item label="仓位数量" :label-width="hmacFormLabelWidth" >
                 <el-slider v-model="hmacForm.positionCountLimit" :min="1" :max="positionCountLimitMax" show-input />
