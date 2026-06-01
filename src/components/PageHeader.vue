@@ -247,7 +247,7 @@
                 <el-slider v-model="hmacForm.cutLoss" :step="0.1" :min="1.0" :max="10.0" show-input />
             </el-form-item>
             <el-form-item label="获利预期" :label-width="hmacFormLabelWidth" >
-                <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.5" :max="10.0" show-input />
+                <el-slider v-model="hmacForm.profit" :step="0.1" :min="0.1" :max="10.0" show-input />
             </el-form-item>
             <el-form-item label="交易指标" :label-width="hmacFormLabelWidth" >
                 <el-radio-group v-model="hmacForm.autoTradeType" size="small">
@@ -255,6 +255,7 @@
                     <el-radio-button label="价格行为" :value="1" />
                     <!--<el-radio-button label="指数均线" :value="2" />-->
                     <el-radio-button label="盘整区间" :value="3" />
+                    <el-radio-button label="投机取巧" :value="6" />
                 </el-radio-group>
             </el-form-item>
             <el-form-item v-if="hmacForm.autoTradeType == 0 || hmacForm.autoTradeType == 1" label="回撤比例" :label-width="hmacFormLabelWidth" >
