@@ -274,6 +274,12 @@
                     <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
+            <el-form-item label="双向持仓" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.dualSidePosition" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
             <el-form-item label="跟踪委托" :label-width="hmacFormLabelWidth">
                 <el-radio-group v-model="hmacForm.callbackRateEnabled" size="small">
                     <el-radio-button label="开启" :value="1" />
@@ -788,6 +794,7 @@
         tradePolicyType: 0,
         positionCountLimit: 100,
         tradeNumberIndex: 100,
+        dualSidePosition: 0,
     })
 
     const changeApiSetting = ()=>{
@@ -956,6 +963,7 @@
             hmacForm.tradePolicyType = result.tradePolicyType;
             hmacForm.positionCountLimit = result.positionCountLimit;
             hmacForm.tradeNumberIndex = result.tradeNumberIndex;
+            hmacForm.dualSidePosition = result.dualSidePosition;
 
             emailForm.smtpHost = result.smtpHost;
             emailForm.smtpPort = new String(result.smtpPort);
