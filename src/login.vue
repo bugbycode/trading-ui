@@ -11,7 +11,7 @@
 
       <div class="inputBox"> 
 
-       <input type="text" @keyup.enter="login" v-model="userInput" required> <i>账号</i> 
+       <input type="text" @keyup.enter="login" v-model="userInput" required autocomplete="off"> <i>账号</i> 
 
       </div> 
 
