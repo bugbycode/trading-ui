@@ -95,6 +95,12 @@
     <!--修改用户信息表单START-->
     <el-dialog v-model="dialogSettingFormVisible" title="行情监控" width="600">
         <el-form :model="settingForm">
+            <el-form-item label="跟随主力" :label-width="settingLabelWidth" >
+                <el-radio-group v-model="settingForm.followMaster" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
+                </el-radio-group>
+            </el-form-item>
             <el-form-item label="价格回撤" :label-width="settingLabelWidth" >
                 <el-radio-group v-model="settingForm.fibMonitor" size="small">
                     <el-radio-button label="开启" :value="1" />
@@ -266,6 +272,12 @@
                     <el-radio-button label="Lv3(0.618)" :value="3" />
                     <el-radio-button label="Lv4(0.786)" :value="4" />
                     <el-radio-button label="Lv5(1.0)" :value="5" />
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="跟随主力" :label-width="hmacFormLabelWidth" >
+                <el-radio-group v-model="hmacForm.tradeFollowMaster" size="small">
+                    <el-radio-button label="开启" :value="1" />
+                    <el-radio-button label="关闭" :value="0"/>
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="自动交易" :label-width="hmacFormLabelWidth" >
@@ -795,6 +807,7 @@
         positionCountLimit: 100,
         tradeNumberIndex: 100,
         dualSidePosition: 0,
+        tradeFollowMaster: 0,
     })
 
     const changeApiSetting = ()=>{
@@ -884,6 +897,7 @@
         monitorfibLevel: 0, //价格回撤级别（行情监控使用）
         eoptionsStatus: 0, //期权交易机会监控  0：否 1：是
         tradeNumberIndexMonitor: 100, //市场活跃度排名索引，值越小热度越高 行情监控
+        followMaster: 0,//跟随主力(行情监控) 0：否 1：是
     });
 
     const openSettingForm = () => {
@@ -935,6 +949,7 @@
             settingForm.monitorfibLevel = result.monitorfibLevel;
             settingForm.eoptionsStatus = result.eoptionsStatus;
             settingForm.tradeNumberIndexMonitor = result.tradeNumberIndexMonitor;
+            settingForm.followMaster = result.followMaster;
 
             hmacForm.autoTrade = result.autoTrade;
             hmacForm.autoTradeType = result.autoTradeType;
@@ -964,6 +979,7 @@
             hmacForm.positionCountLimit = result.positionCountLimit;
             hmacForm.tradeNumberIndex = result.tradeNumberIndex;
             hmacForm.dualSidePosition = result.dualSidePosition;
+            hmacForm.tradeFollowMaster = result.tradeFollowMaster;
 
             emailForm.smtpHost = result.smtpHost;
             emailForm.smtpPort = new String(result.smtpPort);
