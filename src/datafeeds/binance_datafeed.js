@@ -520,7 +520,7 @@ export default {
         if(coinInfo.child_contractType) {
             return false;
         }
-        var url = baseWebSocketUrl + "/ws/" + coinInfo.pair.toLowerCase() + '_' + coinInfo.contractType.toLowerCase() + '@continuousKline_' + inervalData[resolution].toLowerCase();
+        var url = baseWebSocketUrl + "/market/ws/" + coinInfo.pair.toLowerCase() + '_' + coinInfo.contractType.toLowerCase() + '@continuousKline_' + inervalData[resolution].toLowerCase();
         //console.log(url);
         var socketClient = new WebSocket(url);
         
